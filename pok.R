@@ -7,7 +7,7 @@ options(keep.source = TRUE)
 dumpDisassemble <- function(raw, prefix="", deph=0){
     maxdeph <- 3
 
-    dput(raw)
+#    dput(raw)
 
     constants <- raw[[3]]
     code <- raw[[2]]
@@ -20,37 +20,37 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
     i <- 2
     while( i <= n ) {
         v <- code[[i]]
-        if(typeof(v) == "integer"){   #reference to constant table or label
+        if(
+            v == "GOTO.OP"
+            ||
+            v == "STEPFOR.OP"
+        ){
+            i<-i+1
+            v <- code[[i]]
+            labels[[v+1]] <- -1
+        }else if(
+            v == "BRIFNOT.OP"
+            ||
+            v == "AND1ST.OP"
+            ||
+            v == "OR1ST.OP"
+            ||
+            v == "STARTSUBSET_N.OP"
+            ||
+            v == "STARTLOOPCNTXT.OP"
+        ){
+            i<-i+2
+            v <- code[[i]]
+            labels[[v+1]] <- -1
+        }else if(
+            v == "STARTFOR.OP"
+        ){
+            i<-i+3
+            v <- code[[i]]
+            labels[[v+1]] <- -1
         }else{
-            if(
-                v == "GOTO.OP"
-                ||
-                v == "STEPFOR.OP"
-            ){
-                i<-i+1
-                v <- code[[i]]
-                labels[[v]] <- -1;
-            }else if(
-                v == "BRIFNOT.OP"
-                ||
-                v == "AND1ST.OP"
-                ||
-                v == "OR1ST.OP"
-                ||
-                v == "STARTSUBSET_N.OP"
-                ||
-                v == "STARTLOOPCNTXT.OP"
-            ){
-                i<-i+2
-                v <- code[[i]]
-                labels[[v]] <- -1;
-            }else if(
-                v == "STARTFOR.OP"
-            ){
-                i<-i+3
-                v <- code[[i]]
-                labels[[v]] <- -1;
-            }
+            #every other instruction is treated as instruction following with only constants arguments
+
         }
         i<-i+1
     }
@@ -81,7 +81,8 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
         }
     }
     dumpLabel<-function(v){
-        cat(paste0( "\t#",labels[[ v ]] ))
+#        cat(paste0( "\t#",labels[[ v+1 ]], "->", code[[v+1]] ))
+        cat(paste0( "\t#",labels[[ v+1 ]] ))
     }
     dumpOp<-function(v){
         cat(paste(v))
@@ -89,54 +90,62 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
     cat(paste0(prefix,"#0:"))
     while( i <= n ) {
         v <- code[[i]]
-        if(typeof(v) == "integer"){   #reference to constant table or label
-            dumpConstant(v)
-        }else{ #normal operator
-            cat("\n")
-            if(labels[[i]] > 0){
-                cat(paste0(prefix,"#",labels[[i]],":\n"))
-            }
-            cat(paste0(prefix,"  "))
-            dumpOp(v)
 
-            if(
-                v == "GOTO.OP"
-                ||
-                v == "STEPFOR.OP"
-            ){
-                i<-i+1
-                v <- code[[i]]
-                dumpLabel(v)
-            }else if(
-                v == "BRIFNOT.OP"
-                ||
-                v == "AND1ST.OP"
-                ||
-                v == "OR1ST.OP"
-                ||
-                v == "STARTSUBSET_N.OP"
-                ||
-                v == "STARTLOOPCNTXT.OP"
-            ){
-                i<-i+1
+        cat("\n")
+        if(labels[[i]] > 0){
+            cat(paste0(prefix,"#",labels[[i]],":\n"))
+        }
+        cat(paste0(prefix,"  "))
+        dumpOp(v)
+
+        if(
+            v == "GOTO.OP"
+            ||
+            v == "STEPFOR.OP"
+        ){
+            i<-i+1
+            v <- code[[i]]
+            dumpLabel(v)
+        }else if(
+            v == "BRIFNOT.OP"
+            ||
+            v == "AND1ST.OP"
+            ||
+            v == "OR1ST.OP"
+            ||
+            v == "STARTSUBSET_N.OP"
+            ||
+            v == "STARTLOOPCNTXT.OP"
+        ){
+            i<-i+1
+            v <- code[[i]]
+            dumpConstant(v)
+            i<-i+1
+            v <- code[[i]]
+            dumpLabel(v)
+        }else if(
+            v == "STARTFOR.OP"
+        ){
+            i<-i+1
+            v <- code[[i]]
+            dumpConstant(v)
+            i<-i+1
+            v <- code[[i]]
+            dumpConstant(v)
+            i<-i+1
+            v <- code[[i]]
+            dumpLabel(v)
+        }else{
+            #every other instruction is treated as instruction following with only constants arguments
+
+            ni <- i+1
+            while(ni <= n && typeof(code[[ni]]) == "integer"){   #reference to constant table or label
+                i<-ni
                 v <- code[[i]]
                 dumpConstant(v)
-                i<-i+1
-                v <- code[[i]]
-                dumpLabel(v)
-            }else if(
-                v == "STARTFOR.OP"
-            ){
-                i<-i+1
-                v <- code[[i]]
-                dumpConstant(v)
-                i<-i+1
-                v <- code[[i]]
-                dumpConstant(v)
-                i<-i+1
-                v <- code[[i]]
-                dumpLabel(v)
+                ni <- i+1
             }
+
         }
         i<-i+1
     }
@@ -149,8 +158,8 @@ r <- function(x,y){
 
     i <- 2
     while( i < 10 && (i < 100 || i > 140) ){
-	i <- i + f()
-	r <- r + i
+        i <- i + f()
+        r <- r + i
     }
 
     ret
