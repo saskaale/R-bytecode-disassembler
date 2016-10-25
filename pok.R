@@ -1,8 +1,9 @@
 library(compiler)
 
+options(keep.source = TRUE)
+
 source("basics.R")
 
-options(keep.source = TRUE)
 
 
 Opcodes.argc <- list(
@@ -264,18 +265,37 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
     maxdeph <- 3
 
 #    dput(raw)
+#    dput(attr(raw, "srcref"))
 
     constants <- raw[[3]]
     code <- raw[[2]]
 
+#    dput(constants[[length(constants)-2]]);
+#    dput(constants[[length(constants)-1]]);
+#    dput(constants[[length(constants)-0]]);
 
+    if(length(constants) > 2){
+        srcref <- constants[[length(constants)-2]];
+        if(class(srcref) == "srcref"){
+          environm <- attr(srcref, "srcfile")
+          filename <- get("filename", envir=environm)
+          if(nchar(filename) > 0){
+              cat(paste0(prefix,"# ",filename,":",srcref[[1]],"\n"))
+          }
+        }
+    }
+
+
+    #2 operands and addresses are on the 2nd place
     op2addr2 <- c(GOTO.OP, STEPFOR.OP)
+    #3 operands and addresses are on the 3rd place
     op3addr3 <- c(BRIFNOT.OP, AND1ST.OP, OR1ST.OP, STARTSUBSET_N.OP, STARTLOOPCNTXT.OP)
+    #4 operands and addresses are on the 4th place
     op4addr4 <- c(STARTFOR.OP)
 
     op2addr2 <- lapply(op2addr2, function(v){Opcodes.names[v+1]})
     op3addr3 <- lapply(op3addr3, function(v){Opcodes.names[v+1]})
-    op4addr4 <- lapply(op4addr4, function(v){Opcodes.names[v+1]})
+    op4addr4 <- lapply(op4addr4, function(v){Opcodes.names[v+1]})<
 
     cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
 
@@ -304,7 +324,7 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
         }
         i<-i+1
     }
-    
+
     #second pass to count labels
     i <- 2
     lastlabelno <- 0;
@@ -332,10 +352,8 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
             cat(paste0("\t",z))
         }
     }
-    
 
     dumpLabel<-function(v){
-#        cat(paste0( "\t#",labels[[ v+1 ]], "->", code[[v+1]] ))
         cat(paste0( "\t#",labels[[ v+1 ]] ))
     }
     dumpOp<-function(v){
@@ -412,12 +430,20 @@ r <- function(x, y) {
 }
 
 
-getSrcFilename(sr)
-getSrcLocation(sr)
+#getSrcFilename(sr)
+#getSrcLocation(sr)
 
 #d <- compiler::disassemble(compiler::cmpfun(function(x,y) x + y))
 #compiler::disassemble(compiler::cmpfun(sr))
-dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)))
+dumpDisassemble(compiler::disassemble(compiler::cmpfun(sr)))
+
+#dput(getSrcLocation(r))
+#dput(getSrcref(r))
+
+#srcref <- attr(getSrcref(r), "srcfile")
+#get("filename", envir=srcref)
+#dput(srcref)
+#dput(attr("filename", attr(getSrcref(r), "srcfile")))
 
 #help(getSrcref)
 
