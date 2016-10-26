@@ -276,10 +276,28 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
 #    dput(constants[[length(constants)-2]]);
 #    dput(constants[[length(constants)-1]]);
 #    dput(length(constants[[length(constants)-1]]))
-    dput(constants[[length(constants)-0]]);
-    dput(length(constants[[length(constants)-0]]))
+#    dput(constants[[length(constants)-0]]);
+#    dput(length(constants[[length(constants)-0]]))
 
-    expressionsIndex = constants[[length(constants)-1]];
+    expressionsIndex   <- constants[[length(constants)-1]];
+    srcrefsIndex       <- constants[[length(constants)-0]];
+    myExpressionsIndex <- rep(-1, length(expressionsIndex));
+
+    n <- length(code)
+    i <- n
+    lastSrcRef <- -1
+    lastExprIndex <- -1;
+    while( i > 1 ) {
+        srcRef <- srcrefsIndex[[i]]
+        if(srcRef != lastSrcRef){
+            lastSrcRef <- srcRef
+            lastExprIndex <- expressionsIndex[[i]]
+        }
+        myExpressionsIndex[[i]] <- lastExprIndex
+
+        i <- i-1
+    }
+
 
     if(length(constants) > 2){
         srcref <- constants[[length(constants)-2]];
@@ -374,7 +392,7 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
 
         cat("\n")
 
-        curExprIndex <- expressionsIndex[[i]]
+        curExprIndex <- myExpressionsIndex[[i]]
         if(curExprIndex != lastExprIndex){
             cat(paste0(prefix,"  # "))
             dumpConstant(curExprIndex)
