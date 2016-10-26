@@ -1,3 +1,9 @@
+######################################
+#                                    #
+#   copied from GNU R repository     #
+#                                    #
+######################################
+
 library(compiler)
 
 options(keep.source=TRUE)
