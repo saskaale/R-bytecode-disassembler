@@ -1,6 +1,6 @@
 library(compiler)
 
-options(keep.source = TRUE)
+#options(keep.source = TRUE)
 
 source("basics.R")
 
@@ -269,10 +269,17 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
 
     constants <- raw[[3]]
     code <- raw[[2]]
+#    dput(code)
+#    dput(constants)
+#    dput(length(code))
 
 #    dput(constants[[length(constants)-2]]);
 #    dput(constants[[length(constants)-1]]);
-#    dput(constants[[length(constants)-0]]);
+#    dput(length(constants[[length(constants)-1]]))
+    dput(constants[[length(constants)-0]]);
+    dput(length(constants[[length(constants)-0]]))
+
+    expressionsIndex = constants[[length(constants)-1]];
 
     if(length(constants) > 2){
         srcref <- constants[[length(constants)-2]];
@@ -341,7 +348,7 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
     dumpConstant<-function(v){
         v <- constants[[v+1]]
         if(typeof(v) == "list"){
-            cat("\t<FUNCTION>")
+            cat("<FUNCTION>")
             if(deph < maxdeph){
                 cat("\n")
                 dumpDisassemble(v, paste0(prefix,"   "),deph+1)
@@ -349,21 +356,32 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
         }else{
             #hack to print expression tree in infix notation instead of prefix
             z <- capture.output(dput(v))
-            cat(paste0("\t",z))
+            cat(paste0(z))
         }
     }
 
     dumpLabel<-function(v){
-        cat(paste0( "\t#",labels[[ v+1 ]] ))
+        cat(paste0( "#",labels[[ v+1 ]] ))
     }
     dumpOp<-function(v){
         cat(paste(v))
     }
+    lastExprIndex <- -1
+
     cat(paste0(prefix,"#0:"))
     while( i <= n ) {
         v <- code[[i]]
 
         cat("\n")
+
+        curExprIndex <- expressionsIndex[[i]]
+        if(curExprIndex != lastExprIndex){
+            cat(paste0(prefix,"  # "))
+            dumpConstant(curExprIndex)
+            cat("\n")
+            lastExprIndex <- curExprIndex
+        }
+
         if(labels[[i]] > 0){
             cat(paste0(prefix,"#",labels[[i]],":\n"))
         }
@@ -377,19 +395,24 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
         }else if( paste0(v) %in% op3addr3 ){
             i<-i+1
             v <- code[[i]]
+            cat("\t")
             dumpConstant(v)
             i<-i+1
             v <- code[[i]]
+            cat("\t")
             dumpLabel(v)
         }else if( paste0(v) %in% op4addr4 ){
             i<-i+1
             v <- code[[i]]
+            cat("\t")
             dumpConstant(v)
             i<-i+1
             v <- code[[i]]
+            cat("\t")
             dumpConstant(v)
             i<-i+1
             v <- code[[i]]
+            cat("\t")
             dumpLabel(v)
         }else{
             #every other instruction is treated as instruction following with only constants arguments
@@ -398,6 +421,7 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
             while(ni <= n && typeof(code[[ni]]) == "integer"){   #reference to constant table
                 i<-ni
                 v <- code[[i]]
+                cat("\t")
                 dumpConstant(v)
                 ni <- i+1
             }
@@ -435,7 +459,7 @@ r <- function(x, y) {
 
 #d <- compiler::disassemble(compiler::cmpfun(function(x,y) x + y))
 #compiler::disassemble(compiler::cmpfun(sr))
-dumpDisassemble(compiler::disassemble(compiler::cmpfun(sr)))
+dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)))
 
 #dput(getSrcLocation(r))
 #dput(getSrcref(r))
