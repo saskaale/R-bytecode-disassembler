@@ -409,6 +409,7 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
         if( paste0(v) %in% op2addr2 ){
             i<-i+1
             v <- code[[i]]
+            cat("\t")
             dumpLabel(v)
         }else if( paste0(v) %in% op3addr3 ){
             i<-i+1
@@ -452,7 +453,7 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
 
 
 r <- function(x,y){
-    ret <- 20
+    ret <- 20*x+10
 
     i <- 2
     while( i < 10 && (i < 100 || i > 140) ){
@@ -463,13 +464,18 @@ r <- function(x,y){
     ret
 }
 
-
 # This is an example function
 r <- function(x, y) {
  z <- x * x + y
  z <- sin(z) + z^2
- x * x + y
+ if(x > y){
+   x * x + y
+ }else{
+   x * x
+ }
 }
+
+
 
 
 #getSrcFilename(sr)
