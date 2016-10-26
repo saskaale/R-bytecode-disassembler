@@ -286,11 +286,11 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
     }
 
 
-    #2 operands and addresses are on the 2nd place
+    #2 operands and address is on the 2nd place
     op2addr2 <- c(GOTO.OP, STEPFOR.OP)
-    #3 operands and addresses are on the 3rd place
+    #3 operands and address is on the 3rd place
     op3addr3 <- c(BRIFNOT.OP, AND1ST.OP, OR1ST.OP, STARTSUBSET_N.OP, STARTLOOPCNTXT.OP)
-    #4 operands and addresses are on the 4th place
+    #4 operands and address is on the 4th place
     op4addr4 <- c(STARTFOR.OP)
 
     op2addr2 <- lapply(op2addr2, function(v){Opcodes.names[v+1]})
@@ -395,7 +395,7 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
             #every other instruction is treated as instruction following with only constants arguments
 
             ni <- i+1
-            while(ni <= n && typeof(code[[ni]]) == "integer"){   #reference to constant table or label
+            while(ni <= n && typeof(code[[ni]]) == "integer"){   #reference to constant table
                 i<-ni
                 v <- code[[i]]
                 dumpConstant(v)
