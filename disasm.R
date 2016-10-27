@@ -261,54 +261,52 @@ SEQLEN.OP <- 122
 
 
 
-dumpDisassemble <- function(raw, prefix="", deph=0){
+dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     maxdeph <- 3
-
-#    dput(raw)
-#    dput(attr(raw, "srcref"))
 
     constants <- raw[[3]]
     code <- raw[[2]]
-#    dput(code)
-#    dput(constants)
-#    dput(length(code))
-
-#    dput(constants[[length(constants)-2]]);
-#    dput(constants[[length(constants)-1]]);
-#    dput(length(constants[[length(constants)-1]]))
-#    dput(constants[[length(constants)-0]]);
-#    dput(length(constants[[length(constants)-0]]))
 
     expressionsIndex   <- constants[[length(constants)-1]];
     srcrefsIndex       <- constants[[length(constants)-0]];
-    myExpressionsIndex <- rep(-1, length(expressionsIndex));
 
-    n <- length(code)
-    i <- n
-    lastSrcRef <- -1
-    lastExprIndex <- -1;
-    while( i > 1 ) {
-        srcRef <- srcrefsIndex[[i]]
-        if(srcRef != lastSrcRef){
-            lastSrcRef <- srcRef
-            lastExprIndex <- expressionsIndex[[i]]
+
+
+    #pre-process expressions index to find out last expression of each source expression
+    if(verbose){
+        myExpressionsIndex <- rep(-1, length(expressionsIndex));
+
+        n <- length(code)
+        i <- n
+        lastSrcRef <- -1
+        lastExprIndex <- -1;
+        while( i > 1 ) {
+            srcRef <- srcrefsIndex[[i]]
+            if(srcRef != lastSrcRef){
+                lastSrcRef <- srcRef
+                lastExprIndex <- expressionsIndex[[i]]
+            }
+            myExpressionsIndex[[i]] <- lastExprIndex
+
+            i <- i-1
         }
-        myExpressionsIndex[[i]] <- lastExprIndex
-
-        i <- i-1
     }
 
 
+    #print leading source reference
     if(length(constants) > 2){
         srcref <- constants[[length(constants)-2]];
         if(class(srcref) == "srcref"){
           environm <- attr(srcref, "srcfile")
           filename <- get("filename", envir=environm)
           if(nchar(filename) > 0){
-              cat(paste0(prefix,"# ",filename,":",srcref[[1]],"\n"))
+              cat(paste0(prefix,"@ ",filename,"#",srcref[[1]],"\n"))
           }
         }
     }
+
+
+
 
 
     #2 operands and address is on the 2nd place
@@ -322,8 +320,8 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
     op3addr3 <- lapply(op3addr3, function(v){Opcodes.names[v+1]})
     op4addr4 <- lapply(op4addr4, function(v){Opcodes.names[v+1]})<
 
-    cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
-
+    if(verbose)
+        cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
 
     #first pass to mark instruction with labels
     n <- length(code)
@@ -369,7 +367,7 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
             cat("<FUNCTION>")
             if(deph < maxdeph){
                 cat("\n")
-                dumpDisassemble(v, paste0(prefix,"   "),deph+1)
+                dumpDisassemble(v, paste0(prefix,"   "),verbose=verbose, deph=deph+1)
             }
         }else{
             #hack to print expression tree in infix notation instead of prefix
@@ -379,29 +377,30 @@ dumpDisassemble <- function(raw, prefix="", deph=0){
     }
 
     dumpLabel<-function(v){
-        cat(paste0( "#",labels[[ v+1 ]] ))
+        cat(paste0( "$",labels[[ v+1 ]] ))
     }
     dumpOp<-function(v){
         cat(paste(v))
     }
     lastExprIndex <- -1
 
-    cat(paste0(prefix,"#0:"))
     while( i <= n ) {
         v <- code[[i]]
 
         cat("\n")
 
-        curExprIndex <- myExpressionsIndex[[i]]
-        if(curExprIndex != lastExprIndex){
-            cat(paste0(prefix,"  # "))
-            dumpConstant(curExprIndex)
-            cat("\n")
-            lastExprIndex <- curExprIndex
+        if(verbose){
+            curExprIndex <- myExpressionsIndex[[i]]
+            if(curExprIndex != lastExprIndex){
+                cat(paste0(prefix,"  @ "))
+                dumpConstant(curExprIndex)
+                cat("\n")
+                lastExprIndex <- curExprIndex
+            }
         }
 
         if(labels[[i]] > 0){
-            cat(paste0(prefix,"#",labels[[i]],":\n"))
+            cat(paste0(prefix,labels[[i]],":\n"))
         }
         cat(paste0(prefix,"  "))
         dumpOp(v)
@@ -483,7 +482,7 @@ r <- function(x, y) {
 
 #d <- compiler::disassemble(compiler::cmpfun(function(x,y) x + y))
 #compiler::disassemble(compiler::cmpfun(sr))
-dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)))
+dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)), verbose=TRUE)
 
 #dput(getSrcLocation(r))
 #dput(getSrcref(r))
