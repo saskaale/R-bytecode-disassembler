@@ -383,6 +383,7 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     }
     dumpOp<-function(v){
         v <- sub("\\.OP$", "", v, perl=TRUE) # example "GOTO.OP" >> "GOTO"
+        v <- sprintf("%-15s", v)
         cat(paste(v))
     }
     lastExprIndex <- -1
