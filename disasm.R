@@ -312,7 +312,7 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
 
     op2addr2 <- lapply(op2addr2, function(v){Opcodes.names[v+1]})
     op3addr3 <- lapply(op3addr3, function(v){Opcodes.names[v+1]})
-    op4addr4 <- lapply(op4addr4, function(v){Opcodes.names[v+1]})<
+    op4addr4 <- lapply(op4addr4, function(v){Opcodes.names[v+1]})
 
     if(verbose)
         cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
