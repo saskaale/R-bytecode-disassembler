@@ -371,15 +371,18 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
             }
         }else{
             #hack to print expression tree in infix notation instead of prefix
+#            dput(v);
             z <- capture.output(dput(v))
+            z <- sub("(\\s)\\s*", "\\1", z, perl=TRUE);
             cat(paste0(z))
         }
     }
 
     dumpLabel<-function(v){
-        cat(paste0( "$",labels[[ v+1 ]] ))
+        cat(paste0( "$", labels[[ v+1 ]] ))
     }
     dumpOp<-function(v){
+        v <- sub("\\.OP$", "", v, perl=TRUE) # example "GOTO.OP" >> "GOTO"
         cat(paste(v))
     }
     lastExprIndex <- -1
@@ -388,6 +391,11 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
         v <- code[[i]]
 
         cat("\n")
+
+        if(labels[[i]] > 0){
+            cat(paste0(prefix,labels[[i]],":\n"))
+        }
+
 
         if(verbose){
             curExprIndex <- myExpressionsIndex[[i]]
@@ -399,9 +407,6 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
             }
         }
 
-        if(labels[[i]] > 0){
-            cat(paste0(prefix,labels[[i]],":\n"))
-        }
         cat(paste0(prefix,"  "))
         dumpOp(v)
 
