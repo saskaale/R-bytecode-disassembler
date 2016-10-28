@@ -1,3 +1,5 @@
+library(compiler)
+
 Opcodes.argc <- list(
 BCMISMATCH.OP = 0,
 RETURN.OP = 0,
@@ -358,14 +360,21 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     dumpConstant<-function(v){
         v <- constants[[v+1]]
         if(typeof(v) == "list"){
-            cat("<FUNCTION>")
             if(deph < maxdeph){
+
+#                dput(v);
+                if(typeof(v[[2]]) == "bytecode"){
+                    v <- compiler::disassemble(v[[2]])
+                    cat("<FUNCTION>")
+                }else{
+                    cat("<NATIVE FUNCTION>")
+                }
+
                 cat("\n")
                 dumpDisassemble(v, paste0(prefix,"   "),verbose=verbose, deph=deph+1)
             }
         }else{
             #hack to print expression tree in infix notation instead of prefix
-#            dput(v);
             z <- capture.output(dput(v))
             z <- sub("(\\s)\\s*", "\\1", z, perl=TRUE);
             cat(paste0(z))
