@@ -1,11 +1,3 @@
-library(compiler)
-
-#options(keep.source = TRUE)
-
-source("basics.R")
-
-
-
 Opcodes.argc <- list(
 BCMISMATCH.OP = 0,
 RETURN.OP = 0,
@@ -270,10 +262,12 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     expressionsIndex   <- constants[[length(constants)-1]];
     srcrefsIndex       <- constants[[length(constants)-0]];
 
+    dumpSrcrefs <- verbose && class(expressionsIndex) == 'expressionsIndex' && class(srcrefsIndex) == 'srcrefsIndex';
 
 
     #pre-process expressions index to find out last expression of each source expression
-    if(verbose){
+    if(dumpSrcrefs){
+
         myExpressionsIndex <- rep(-1, length(expressionsIndex));
 
         n <- length(code)
@@ -398,7 +392,7 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
         }
 
 
-        if(verbose){
+        if(dumpSrcrefs){
             curExprIndex <- myExpressionsIndex[[i]]
             if(curExprIndex != lastExprIndex){
                 cat(paste0(prefix,"  @ "))
@@ -457,49 +451,3 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     }
     cat("\n")
 }
-
-
-r <- function(x,y){
-    ret <- 20*x+10
-
-    i <- 2
-    while( i < 10 && (i < 100 || i > 140) ){
-        i <- i + f()
-        r <- r + i
-    }
-
-    ret
-}
-
-# This is an example function
-r <- function(x, y) {
- z <- x * x + y
- z <- sin(z) + z^2
- if(x > y){
-   x * x + y
- }else{
-   x * x
- }
-}
-
-
-
-
-#getSrcFilename(sr)
-#getSrcLocation(sr)
-
-#d <- compiler::disassemble(compiler::cmpfun(function(x,y) x + y))
-#compiler::disassemble(compiler::cmpfun(sr))
-dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)), verbose=TRUE)
-
-#dput(getSrcLocation(r))
-#dput(getSrcref(r))
-
-#srcref <- attr(getSrcref(r), "srcfile")
-#get("filename", envir=srcref)
-#dput(srcref)
-#dput(attr("filename", attr(getSrcref(r), "srcfile")))
-
-#help(getSrcref)
-
-#dput(d)
