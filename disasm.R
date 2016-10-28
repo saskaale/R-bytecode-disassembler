@@ -383,7 +383,7 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     }
     dumpOp<-function(v){
         v <- sub("\\.OP$", "", v, perl=TRUE) # example "GOTO.OP" >> "GOTO"
-        v <- sprintf("%-15s", v)
+        v <- sprintf("%-20s", v)
         cat(paste(v))
     }
     lastExprIndex <- -1
@@ -414,12 +414,10 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
         if( paste0(v) %in% op2addr2 ){
             i<-i+1
             v <- code[[i]]
-            cat("\t")
             dumpLabel(v)
         }else if( paste0(v) %in% op3addr3 ){
             i<-i+1
             v <- code[[i]]
-            cat("\t")
             dumpConstant(v)
             i<-i+1
             v <- code[[i]]
@@ -428,7 +426,6 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
         }else if( paste0(v) %in% op4addr4 ){
             i<-i+1
             v <- code[[i]]
-            cat("\t")
             dumpConstant(v)
             i<-i+1
             v <- code[[i]]
@@ -441,11 +438,16 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
         }else{
             #every other instruction is treated as instruction following with only constants arguments
 
+            first <- TRUE
             ni <- i+1
             while(ni <= n && typeof(code[[ni]]) == "integer"){   #reference to constant table
                 i<-ni
                 v <- code[[i]]
-                cat("\t")
+                if(first){
+                    first = FALSE
+                }else{
+                    cat("\t")
+                }
                 dumpConstant(v)
                 ni <- i+1
             }
