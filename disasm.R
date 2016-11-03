@@ -366,12 +366,15 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
                 if(typeof(v[[2]]) == "bytecode"){
                     v <- compiler::disassemble(v[[2]])
                     cat("<FUNCTION>")
+                    dumpDisassemble(v, paste0(prefix,"   "),verbose=verbose, deph=deph+1)
+                    cat("\n")
                 }else{
-                    cat("<NATIVE FUNCTION>")
+                    cat("<INTERNAL_FUNCTION>")
+#                    dumpDisassemble(v, paste0(prefix,"   "),verbose=verbose, deph=deph+1)
+#                    cat("\n")
+#                    dput(v);
                 }
 
-                cat("\n")
-                dumpDisassemble(v, paste0(prefix,"   "),verbose=verbose, deph=deph+1)
             }
         }else{
             #hack to print expression tree in infix notation instead of prefix
