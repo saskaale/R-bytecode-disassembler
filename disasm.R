@@ -261,14 +261,21 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     constants <- raw[[3]]
     code <- raw[[2]]
 
-    expressionsIndex   <- constants[[length(constants)-1]];
-    srcrefsIndex       <- constants[[length(constants)-0]];
+    for (cnst in rev(constants)){
+      if (class(cnst)=="srcrefsIndex")     srcrefsIndex <- cnst
+      if (class(cnst)=="expressionsIndex") expressionsIndex <- cnst
+      if (class(cnst)=="srcref")           srcref <- cnst
+    }
 
-    dumpSrcrefs <- verbose && class(expressionsIndex) == 'expressionsIndex' && class(srcrefsIndex) == 'srcrefsIndex';
+#    dput(srcref);
+#   dput(srcrefsIndex);
 
+
+    dumpExpressions <- exists("expressionsIndex") && exists("srcrefsIndex");
+    dumpSrcrefs     <- exists("expressionsIndex") && exists("srcrefsIndex");
 
     #pre-process expressions index to find out last expression of each source expression
-    if(dumpSrcrefs){
+    if(dumpExpressions){
 
         myExpressionsIndex <- rep(-1, length(expressionsIndex));
 
@@ -290,15 +297,12 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
 
 
     #print leading source reference
-    if(length(constants) > 2){
-        srcref <- constants[[length(constants)-2]];
-        if(class(srcref) == "srcref"){
-          environm <- attr(srcref, "srcfile")
-          filename <- get("filename", envir=environm)
-          if(nchar(filename) > 0){
-              cat(paste0(prefix,"@ ",filename,"#",srcref[[1]],"\n"))
-          }
-        }
+    if(exists("srcref")){
+      environm <- attr(srcref, "srcfile")
+      filename <- get("filename", envir=environm)
+      if(nchar(filename) > 0){
+          cat(paste0(prefix,"@ ",filename,"#",srcref[[1]],"\n"))
+      }
     }
 
 
@@ -404,7 +408,7 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
         }
 
 
-        if(dumpSrcrefs){
+        if(dumpExpressions){
             curExprIndex <- myExpressionsIndex[[i]]
             if(curExprIndex != lastExprIndex){
                 cat(paste0(prefix,"  @ "))
