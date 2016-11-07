@@ -267,15 +267,11 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
       if (class(cnst)=="srcref")           srcref <- cnst
     }
 
-#    dput(srcref);
-#   dput(srcrefsIndex);
-
-
-    dumpExpressions <- exists("expressionsIndex") && exists("srcrefsIndex");
+    dumpExpressions <- verbose && exists("expressionsIndex") && exists("srcrefsIndex");
     dumpSrcrefs     <- exists("expressionsIndex") && exists("srcrefsIndex");
 
     #pre-process expressions index to find out last expression of each source expression
-    if(dumpExpressions){
+    if(dumpExpressions || dumpSrcrefs){
 
         myExpressionsIndex <- rep(-1, length(expressionsIndex));
 
@@ -296,11 +292,13 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     }
 
 
+    dput("Parsed Text")
     #print leading source reference
     if(exists("srcref")){
       environm <- attr(srcref, "srcfile")
-      filename <- get("filename", envir=environm)
-      if(nchar(filename) > 0){
+      filename <- getSrcFilename(environm)
+#      dput(getParseText(environm))
+      if(!identical(filename, character(0))){
           cat(paste0(prefix,"@ ",filename,"#",srcref[[1]],"\n"))
       }
     }
@@ -315,7 +313,6 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     op3addr3 <- c(BRIFNOT.OP, AND1ST.OP, OR1ST.OP, STARTSUBSET_N.OP, STARTLOOPCNTXT.OP)
     #4 operands and address is on the 4th place
     op4addr4 <- c(STARTFOR.OP)
-
     op2addr2 <- lapply(op2addr2, function(v){Opcodes.names[v+1]})
     op3addr3 <- lapply(op3addr3, function(v){Opcodes.names[v+1]})
     op4addr4 <- lapply(op4addr4, function(v){Opcodes.names[v+1]})
@@ -365,8 +362,6 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
         v <- constants[[v+1]]
         if(typeof(v) == "list"){
             if(deph < maxdeph){
-
-#                dput(v);
                 if(typeof(v[[2]]) == "bytecode"){
                     v <- compiler::disassemble(v[[2]])
                     cat("<FUNCTION>")
@@ -408,12 +403,24 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
         }
 
 
-        if(dumpExpressions){
+        if(dumpExpressions || dumpSrcrefs){
             curExprIndex <- myExpressionsIndex[[i]]
+
+
             if(curExprIndex != lastExprIndex){
-                cat(paste0(prefix,"  @ "))
-                dumpConstant(curExprIndex)
-                cat("\n")
+
+                if(dumpSrcrefs){
+                    cursrcref <- constants[[srcrefsIndex[[i]] + 1 ]];
+                    cat(paste0(prefix,"  ",getSrcFilename(cursrcref),"#",getSrcLocation(cursrcref),"\n"))
+                }
+
+
+                if(dumpExpressions){
+                    cat(paste0(prefix,"  @ "))
+                    dumpConstant(curExprIndex)
+                    cat("\n")
+                }
+
                 lastExprIndex <- curExprIndex
             }
         }
@@ -431,7 +438,7 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
             dumpConstant(v)
             i<-i+1
             v <- code[[i]]
-            cat("\t")
+            cat("\t | ")
             dumpLabel(v)
         }else if( paste0(v) %in% op4addr4 ){
             i<-i+1
@@ -439,11 +446,11 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
             dumpConstant(v)
             i<-i+1
             v <- code[[i]]
-            cat("\t")
+            cat("\t | ")
             dumpConstant(v)
             i<-i+1
             v <- code[[i]]
-            cat("\t")
+            cat("\t | ")
             dumpLabel(v)
         }else{
             #every other instruction is treated as instruction following with only constants arguments
@@ -456,7 +463,7 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
                 if(first){
                     first = FALSE
                 }else{
-                    cat("\t")
+                    cat("\t | ")
                 }
                 dumpConstant(v)
                 ni <- i+1
