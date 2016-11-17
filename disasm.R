@@ -292,7 +292,6 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     }
 
 
-    dput("Parsed Text")
     #print leading source reference
     if(exists("srcref")){
       environm <- attr(srcref, "srcfile")
@@ -391,6 +390,14 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
         v <- sprintf("%-20s", v)
         cat(paste(v))
     }
+    dumpSrcRef<-function(cursrcref){
+        filename <- getSrcFilename(cursrcref);
+        lineno   <- getSrcLocation(cursrcref);
+
+        o <- capture.output(print(cursrcref))
+
+        cat(paste0(prefix," - ",filename,"#",lineno,": ",o[[1]],"\n"))
+    }
     lastExprIndex <- -1
 
     while( i <= n ) {
@@ -411,7 +418,7 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
 
                 if(dumpSrcrefs){
                     cursrcref <- constants[[srcrefsIndex[[i]] + 1 ]];
-                    cat(paste0(prefix,"  ",getSrcFilename(cursrcref),"#",getSrcLocation(cursrcref),"\n"))
+                    dumpSrcRef(cursrcref)
                 }
 
 
