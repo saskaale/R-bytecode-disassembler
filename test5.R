@@ -18,4 +18,4 @@ r <- function(type) {
 
 
 
-dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)), verbose=TRUE)
+dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)), verbose=1)

@@ -3,6 +3,7 @@ library(compiler)
 options(keep.source = TRUE)
 
 source("disasm.R")
+source("basics.R")
 
 
 
@@ -20,4 +21,4 @@ r <- function(x, y) {
 
 
 
-dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)), verbose=FALSE)
+dumpDisassemble(compiler::disassemble(compiler::cmpfun(sf)), verbose=FALSE)

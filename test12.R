@@ -24,8 +24,8 @@ r3 <- factory(3)
 
 dput("Dumping r2")
 compiled <- compiler::cmpfun(r2)
-dumpDisassemble(compiler::disassemble(compiled), verbose=TRUE)
+dumpDisassemble(compiler::disassemble(compiled), verbose=1)
 
 dput("Dumping r3")
 compiled <- compiler::cmpfun(r3)
-dumpDisassemble(compiler::disassemble(compiled), verbose=TRUE)
+dumpDisassemble(compiler::disassemble(compiled), verbose=1)

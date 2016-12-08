@@ -2,6 +2,7 @@ library(compiler)
 
 options(keep.source = TRUE)
 
+source("basics.R")
 source("disasm.R")
 
 
@@ -19,7 +20,9 @@ r <- function(x, y) {
 
 
 
-
 #dput(compiler::disassemble(compiler::cmpfun(r)));
 
-dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)), verbose=TRUE)
+parsed <- compiler::cmpfun(sf)
+#getParseData(parsed)
+
+dumpDisassemble(compiler::disassemble(parsed), verbose=1)

@@ -19,4 +19,4 @@ r <- function(x, y) {
 
 
 #dput(compiler::cmpfun(r))
-dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)), verbose=TRUE)
+dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)), verbose=1)
