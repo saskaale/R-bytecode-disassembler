@@ -126,6 +126,178 @@ SEQALONG.OP = 1,
 SEQLEN.OP = 1
 )
 
+
+SKIP.ARGTYPE<--1
+LABEL.ARGTYPE<-0
+CONSTANTS.ARGTYPE<-3
+CONSTANTS_DBG.ARGTYPE<-4
+BOOL.ARGTYPE<-11
+INT.ARGTYPE<-10
+
+Opcodes.argdescr <- list(
+
+BCMISMATCH.OP = c(),
+RETURN.OP = c(),
+GOTO.OP = c(LABEL.ARGTYPE),
+BRIFNOT.OP = c(CONSTANTS.ARGTYPE,LABEL.ARGTYPE),
+POP.OP = c(),
+DUP.OP = c(),
+PRINTVALUE.OP = c(),
+STARTLOOPCNTXT.OP = c(BOOL.ARGTYPE, LABEL.ARGTYPE),#  bool is_for_loop, pc for break
+ENDLOOPCNTXT.OP = c(BOOL.ARGTYPE),
+DOLOOPNEXT.OP = c(),
+DOLOOPBREAK.OP = c(),
+STARTFOR.OP = c(CONSTANTS_DBG.ARGTYPE, CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+STEPFOR.OP = c(LABEL.ARGTYPE),
+ENDFOR.OP = c(),
+SETLOOPVAL.OP = c(),
+INVISIBLE.OP = c(),
+LDCONST.OP = c(CONSTANTS.ARGTYPE),
+LDNULL.OP = c(),
+LDTRUE.OP = c(),
+LDFALSE.OP = c(),
+GETVAR.OP = c(CONSTANTS.ARGTYPE),
+DDVAL.OP = c(CONSTANTS.ARGTYPE),
+SETVAR.OP = c(CONSTANTS.ARGTYPE),
+GETFUN.OP = c(CONSTANTS.ARGTYPE),
+GETGLOBFUN.OP = c(CONSTANTS.ARGTYPE),
+GETSYMFUN.OP = c(CONSTANTS.ARGTYPE),
+GETBUILTIN.OP = c(CONSTANTS.ARGTYPE),
+GETINTLBUILTIN.OP = c(CONSTANTS.ARGTYPE),
+CHECKFUN.OP = c(),
+MAKEPROM.OP = c(CONSTANTS.ARGTYPE),
+DOMISSING.OP = c(),
+SETTAG.OP = c(CONSTANTS.ARGTYPE),
+DODOTS.OP = c(),
+PUSHARG.OP = c(),
+PUSHCONSTARG.OP = c(CONSTANTS.ARGTYPE),
+PUSHNULLARG.OP = c(),
+PUSHTRUEARG.OP = c(),
+PUSHFALSEARG.OP = c(),
+CALL.OP = c(CONSTANTS.ARGTYPE),
+CALLBUILTIN.OP = c(CONSTANTS.ARGTYPE),
+CALLSPECIAL.OP = c(CONSTANTS.ARGTYPE),
+MAKECLOSURE.OP = c(CONSTANTS.ARGTYPE),
+UMINUS.OP = c(CONSTANTS_DBG.ARGTYPE),
+UPLUS.OP = c(CONSTANTS_DBG.ARGTYPE),
+ADD.OP = c(CONSTANTS_DBG.ARGTYPE),
+SUB.OP = c(CONSTANTS_DBG.ARGTYPE),
+MUL.OP = c(CONSTANTS_DBG.ARGTYPE),
+DIV.OP = c(CONSTANTS_DBG.ARGTYPE),
+EXPT.OP = c(CONSTANTS_DBG.ARGTYPE),
+SQRT.OP = c(CONSTANTS_DBG.ARGTYPE),
+EXP.OP = c(CONSTANTS_DBG.ARGTYPE),
+EQ.OP = c(CONSTANTS_DBG.ARGTYPE),
+NE.OP = c(CONSTANTS_DBG.ARGTYPE),
+LT.OP = c(CONSTANTS_DBG.ARGTYPE),
+LE.OP = c(CONSTANTS_DBG.ARGTYPE),
+GE.OP = c(CONSTANTS_DBG.ARGTYPE),
+GT.OP = c(CONSTANTS_DBG.ARGTYPE),
+AND.OP = c(CONSTANTS_DBG.ARGTYPE),
+OR.OP = c(CONSTANTS_DBG.ARGTYPE),
+NOT.OP = c(CONSTANTS_DBG.ARGTYPE),
+DOTSERR.OP = c(),
+STARTASSIGN.OP = c(CONSTANTS.ARGTYPE),
+ENDASSIGN.OP = c(CONSTANTS.ARGTYPE),
+STARTSUBSET.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+DFLTSUBSET.OP = c(),
+STARTSUBASSIGN.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+DFLTSUBASSIGN.OP = c(),
+STARTC.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+DFLTC.OP = c(),
+STARTSUBSET2.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+DFLTSUBSET2.OP = c(),
+STARTSUBASSIGN2.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+DFLTSUBASSIGN2.OP = c(),
+DOLLAR.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
+DOLLARGETS.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
+ISNULL.OP = c(),
+ISLOGICAL.OP = c(),
+ISINTEGER.OP = c(),
+ISDOUBLE.OP = c(),
+ISCOMPLEX.OP = c(),
+ISCHARACTER.OP = c(),
+ISSYMBOL.OP = c(),
+ISOBJECT.OP = c(),
+ISNUMERIC.OP = c(),
+VECSUBSET.OP = c(CONSTANTS.ARGTYPE),
+MATSUBSET.OP = c(CONSTANTS.ARGTYPE),
+VECSUBASSIGN.OP = c(CONSTANTS.ARGTYPE),
+MATSUBASSIGN.OP = c(CONSTANTS.ARGTYPE),
+AND1ST.OP = c(CONSTANTS_DBG.ARGTYPE, LABEL.ARGTYPE),
+AND2ND.OP = c(CONSTANTS_DBG.ARGTYPE),
+OR1ST.OP = c(CONSTANTS_DBG.ARGTYPE, LABEL.ARGTYPE),
+OR2ND.OP = c(CONSTANTS_DBG.ARGTYPE),
+GETVAR_MISSOK.OP = c(CONSTANTS.ARGTYPE),
+DDVAL_MISSOK.OP = c(CONSTANTS.ARGTYPE),
+VISIBLE.OP = c(),
+SETVAR2.OP = c(CONSTANTS.ARGTYPE),
+STARTASSIGN2.OP = c(CONSTANTS.ARGTYPE),
+ENDASSIGN2.OP = c(CONSTANTS.ARGTYPE),
+SETTER_CALL.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
+GETTER_CALL.OP = c(CONSTANTS.ARGTYPE),
+SWAP.OP = c(),
+DUP2ND.OP = c(),
+SWITCH.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
+RETURNJMP.OP = c(),
+STARTSUBSET_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+STARTSUBASSIGN_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+VECSUBSET2.OP = c(CONSTANTS.ARGTYPE),
+MATSUBSET2.OP = c(CONSTANTS.ARGTYPE),
+VECSUBASSIGN2.OP = c(CONSTANTS.ARGTYPE),
+MATSUBASSIGN2.OP = c(CONSTANTS.ARGTYPE),
+STARTSUBSET2_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+STARTSUBASSIGN2_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+SUBSET_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
+SUBSET2_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
+SUBASSIGN_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
+SUBASSIGN2_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
+LOG.OP = c(CONSTANTS.ARGTYPE),
+LOGBASE.OP = c(CONSTANTS.ARGTYPE),
+MATH1.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE), #second argument is one of the math1funs
+DOTCALL.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
+COLON.OP = c(SKIP.ARGTYPE),
+SEQALONG.OP = c(SKIP.ARGTYPE),
+SEQLEN.OP = c(SKIP.ARGTYPE)
+)
+
+Opcodes.argc <- lapply(Opcodes.argdescr, length)
+
+#  {"floor", NULL, floor},
+#  {"ceiling", NULL, ceil},
+#  {"sign", NULL, sign},
+#
+#  {"expm1", NULL, expm1},
+#  {"log1p", NULL, log1p},
+#
+#  {"cos", NULL, cos},
+#  {"sin", NULL, sin},
+#  {"tan", NULL, tan},
+#  {"acos", NULL, acos},
+#  {"asin", NULL, asin},
+#  {"atan", NULL, atan},
+#
+#  {"cosh", NULL, cosh},
+#  {"sinh", NULL, sinh},
+#  {"tanh", NULL, tanh},
+#  {"acosh", NULL, acosh},
+#  {"asinh", NULL, asinh},
+#  {"atanh", NULL, atanh},
+#
+#  {"lgamma", NULL, lgammafn},
+#  {"gamma", NULL, gammafn},
+#  {"digamma", NULL, digamma},
+#  {"trigamma", NULL, trigamma},
+#
+#  {"cospi", NULL, cospi},
+#  {"sinpi", NULL, sinpi},
+# ##ifndef HAVE_TANPI
+#  {"tanpi", NULL, tanpi}
+#  #else
+#  {"tanpi", NULL, Rtanpi}
+
+
+
 Opcodes.names <- names(Opcodes.argc)
 
 
@@ -255,7 +427,7 @@ SEQLEN.OP <- 122
 
 
 
-dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
+dumpDisassemble <- function(raw, prefix="", verbose=0, deph=0){
     maxdeph <- 3
 
     constants <- raw[[3]]
@@ -267,7 +439,7 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
       if (class(cnst)=="srcref")           srcref <- cnst
     }
 
-    dumpExpressions <- verbose && exists("expressionsIndex") && exists("srcrefsIndex");
+    dumpExpressions <- verbose > 0 && exists("expressionsIndex") && exists("srcrefsIndex");
     dumpSrcrefs     <- exists("expressionsIndex") && exists("srcrefsIndex");
 
     #pre-process expressions index to find out last expression of each source expression
@@ -316,7 +488,7 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     op3addr3 <- lapply(op3addr3, function(v){Opcodes.names[v+1]})
     op4addr4 <- lapply(op4addr4, function(v){Opcodes.names[v+1]})
 
-    if(verbose)
+    if(verbose > 0)
         cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
 
     #first pass to mark instruction with labels
@@ -325,21 +497,15 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     i <- 2
     while( i <= n ) {
         v <- code[[i]]
-        if( paste0(v) %in% op2addr2 ){
+        argdescr <- Opcodes.argdescr[[paste0(v)]]
+        j <- 1
+        while(j <= length(argdescr)){
             i<-i+1
             v <- code[[i]]
-            labels[[v+1]] <- -1
-        }else if( paste0(v) %in% op3addr3 ){
-            i<-i+2
-            v <- code[[i]]
-            labels[[v+1]] <- -1
-        }else if( paste0(v) %in% op4addr4 ){
-            i<-i+3
-            v <- code[[i]]
-            labels[[v+1]] <- -1
-        }else{
-            #every other instruction is treated as instruction following with only constants arguments
-
+            if(argdescr[[j]] == LABEL.ARGTYPE){
+              labels[[v+1]] <- -1
+            }
+            j<-j+1
         }
         i<-i+1
     }
@@ -356,7 +522,6 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
     }
 
     #third pass to print result
-    i <- 2
     dumpConstant<-function(v){
         v <- constants[[v+1]]
         if(typeof(v) == "list"){
@@ -368,9 +533,6 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
                     cat("\n")
                 }else{
                     cat("<INTERNAL_FUNCTION>")
-#                    dumpDisassemble(v, paste0(prefix,"   "),verbose=verbose, deph=deph+1)
-#                    cat("\n")
-#                    dput(v);
                 }
 
             }
@@ -380,15 +542,24 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
             z <- sub("(\\s)\\s*", "\\1", z, perl=TRUE);
             cat(paste0(z))
         }
+        TRUE
     }
-
+    dumpDbgConstant <- function(v){
+        if(verbose > 1){
+            dumpConstant(v);
+        }else{
+            FALSE
+        }
+    }
     dumpLabel<-function(v){
         cat(paste0( "$", labels[[ v+1 ]] ))
+        TRUE
     }
     dumpOp<-function(v){
         v <- sub("\\.OP$", "", v, perl=TRUE) # example "GOTO.OP" >> "GOTO"
         v <- sprintf("%-20s", v)
         cat(paste(v))
+        TRUE
     }
     dumpSrcRef<-function(cursrcref){
         filename <- getSrcFilename(cursrcref);
@@ -397,31 +568,33 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
         o <- capture.output(print(cursrcref))
 
         cat(paste0(prefix," - ",filename,"#",lineno,": ",o[[1]],"\n"))
+        TRUE
+    }
+    dumpValue<-function(v){
+        cat(v)
+        TRUE
     }
     lastExprIndex <- -1
 
+    i <- 2
     while( i <= n ) {
         v <- code[[i]]
 
         cat("\n")
 
+        #print labels
         if(labels[[i]] > 0){
             cat(paste0(prefix,labels[[i]],":\n"))
         }
 
-
         if(dumpExpressions || dumpSrcrefs){
             curExprIndex <- myExpressionsIndex[[i]]
 
-
             if(curExprIndex != lastExprIndex){
-
                 if(dumpSrcrefs){
                     cursrcref <- constants[[srcrefsIndex[[i]] + 1 ]];
                     dumpSrcRef(cursrcref)
                 }
-
-
                 if(dumpExpressions){
                     cat(paste0(prefix,"  @ "))
                     dumpConstant(curExprIndex)
@@ -435,47 +608,37 @@ dumpDisassemble <- function(raw, prefix="", verbose=FALSE, deph=0){
         cat(paste0(prefix,"  "))
         dumpOp(v)
 
-        if( paste0(v) %in% op2addr2 ){
-            i<-i+1
-            v <- code[[i]]
-            dumpLabel(v)
-        }else if( paste0(v) %in% op3addr3 ){
-            i<-i+1
-            v <- code[[i]]
-            dumpConstant(v)
-            i<-i+1
-            v <- code[[i]]
-            cat("\t | ")
-            dumpLabel(v)
-        }else if( paste0(v) %in% op4addr4 ){
-            i<-i+1
-            v <- code[[i]]
-            dumpConstant(v)
-            i<-i+1
-            v <- code[[i]]
-            cat("\t | ")
-            dumpConstant(v)
-            i<-i+1
-            v <- code[[i]]
-            cat("\t | ")
-            dumpLabel(v)
-        }else{
-            #every other instruction is treated as instruction following with only constants arguments
+        argdescr <- Opcodes.argdescr[[paste0(v)]]
 
-            first <- TRUE
-            ni <- i+1
-            while(ni <= n && typeof(code[[ni]]) == "integer"){   #reference to constant table
-                i<-ni
-                v <- code[[i]]
-                if(first){
-                    first = FALSE
-                }else{
-                    cat("\t | ")
-                }
-                dumpConstant(v)
-                ni <- i+1
+        j <- 1
+        printed <- 0
+        while(j <= length(argdescr)){
+            if(printed >= 1){
+                cat("\t | ")
             }
 
+            i<-i+1
+            v <- code[[i]]
+
+            t = argdescr[[j]]
+            if(t==LABEL.ARGTYPE){
+                if(dumpLabel(v))
+                    printed <- printed + 1
+            }else if(t==CONSTANTS.ARGTYPE){
+                if(dumpConstant(v))
+                    printed <- printed + 1
+            }else if(t==CONSTANTS_DBG.ARGTYPE){
+                if(dumpDbgConstant(v))
+                    printed <- printed + 1
+            }else if(t==BOOL.ARGTYPE){
+                if(dumpValue(v))
+                    printed <- printed + 1
+            }else if(t==INT.ARGTYPE){
+                if(dumpValue(v))
+                    printed <- printed + 1
+            }
+
+            j<-j+1
         }
         i<-i+1
     }
