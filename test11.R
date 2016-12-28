@@ -1,8 +1,7 @@
 library(compiler)
+library(bctools)
 
 options(keep.source = TRUE)
-
-source("disasm.R")
 
 # This is an example function
 r <- function(){
@@ -18,4 +17,4 @@ r <- function(){
 
 
 
-dumpDisassemble(compiler::disassemble(compiler::cmpfun(r)), verbose=1)
+print(compiler::disassemble(compiler::cmpfun(r)), verbose=1)

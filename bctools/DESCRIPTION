@@ -1,0 +1,9 @@
+Package: bctools
+Type: Package
+Version: 0.1.0
+Priority: NA
+Title: The R ByteCode Tools Package
+Author: Ales Saska <mail@alessaska.cz>
+Maintainer: R Core Team <R-core@r-project.org>
+Description: Tools for Byte code in R.
+License: Part of R 3.4.0

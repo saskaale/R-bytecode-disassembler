@@ -1,9 +1,9 @@
 library(compiler)
+library(bctools)
 
 options(keep.source = TRUE)
 
 source("basics.R")
-source("disasm.R")
 
 
 
@@ -20,9 +20,6 @@ r <- function(x, y) {
 
 
 
-#dput(compiler::disassemble(compiler::cmpfun(r)));
-
 parsed <- compiler::cmpfun(sf)
-#getParseData(parsed)
 
-dumpDisassemble(compiler::disassemble(parsed), verbose=1)
+print(compiler::disassemble(parsed), verbose=1)

@@ -1,8 +1,8 @@
 library(compiler)
+library(bctools)
 
 options(keep.source = TRUE)
 
-source("disasm.R")
 source("basics.R")
 
 
@@ -21,4 +21,4 @@ r <- function(x, y) {
 
 
 
-dumpDisassemble(compiler::disassemble(compiler::cmpfun(sf)), verbose=FALSE)
+print(compiler::disassemble(compiler::cmpfun(sf)), verbose=FALSE)
