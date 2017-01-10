@@ -1,32 +1,6 @@
-library(compiler)
-library(bctools)
+source("_tools.R")
 
 options(keep.source=TRUE)
-
-getOutput <- function(bc){
-    capture.output(print(compiler::disassemble(bc)))
-}
-
-operands <- function(out){
-    out <- filterWhitespaces(out)
-
-    #extract src and expr references
-    out <- grep("(- #[0-9])|( @ )",out, value=TRUE, invert=TRUE)
-
-    out
-}
-
-filterWhitespaces <- function(v){
-    #extract empty lines
-    v <- Filter(function(l){nchar(l) > 0}, v)
-
-    #extract whitespaces
-    lapply(v, function(v) gsub("(^\\s)|(\\s$)","",gsub("\\s+", " ", v)) )
-}
-
-eqOut <- function(c1, c2){
-    identical(c1,c2)
-}
 
 ## very minimal
 x <- 2
