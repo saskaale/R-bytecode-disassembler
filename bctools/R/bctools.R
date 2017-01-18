@@ -4,9 +4,9 @@ BCINFO=bcinfo();
 argtypes = BCINFO$Argtypes
 Opcodes.argdescr <- BCINFO$Arguments;
 
-print.disassembly <- function(raw, prefix="", verbose=0, maxdepth=3, deph=0){
-    constants <- raw[[3]]
-    code <- raw[[2]]
+print.disassembly <- function(x, prefix=1, verbose=0, maxdepth=3, deph=0, ...){
+    constants <- x[[3]]
+    code <- x[[2]]
 
 
     for (cnst in rev(constants)){
