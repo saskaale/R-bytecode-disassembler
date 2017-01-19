@@ -1,325 +1,325 @@
-##diff ./compiler.nw ./compiler_old.nw 
-5159,5188d5158
-< \subsection{Bytecode info}
-< Infomation about bytecode is provided by [[bcinfo]]. 
-< This is useful to get definition all instrutions numbers, and their arguments.
-< <<[[bcinfo]] function>>=
-< bcinfo <- function() {
-< 
-<     operands <- setNames(
-<                     lapply(
-<                         Opcodes.names,
-<                         function(x){ get(x, envir=environment(bcinfo)) }
-<                     ), 
-<                     Opcodes.names
-<                 )
-< 
-<     list(
-<         Argtypes=list(
-<             SKIP=SKIP.ARGTYPE,
-<             LABEL=LABEL.ARGTYPE,
-<             CONSTANT=CONSTANTS.ARGTYPE,
-<             CONSTANT_DBG=CONSTANTS_DBG.ARGTYPE,
-<             BOOL=BOOL.ARGTYPE,
-<             INT=INT.ARGTYPE
-<         ),
-<         Arguments=Opcodes.argdescr,
-<         Operands=operands
-<     )
-< }
-< @ %def bcinfo
-< 
-< 
-5191,5194c5161,5163
-< primarily useful for debugging the compiler. It returns parsed 
-< internal representation of bytecode with class "disassembly".
-< The print method for this class which is implemented in the 
-< bctools package.
+##diff ./compiler_old.nw ./compiler.nw
+5158a5159,5188
+> \subsection{Bytecode info}
+> Infomation about bytecode is provided by [[bcinfo]]. 
+> This is useful to get definition all instrutions numbers, and their arguments.
+> <<[[bcinfo]] function>>=
+> bcinfo <- function() {
+> 
+>     operands <- setNames(
+>                     lapply(
+>                         Opcodes.names,
+>                         function(x){ get(x, envir=environment(bcinfo)) }
+>                     ), 
+>                     Opcodes.names
+>                 )
+> 
+>     list(
+>         Argtypes=list(
+>             SKIP=SKIP.ARGTYPE,
+>             LABEL=LABEL.ARGTYPE,
+>             CONSTANT=CONSTANTS.ARGTYPE,
+>             CONSTANT_DBG=CONSTANTS_DBG.ARGTYPE,
+>             BOOL=BOOL.ARGTYPE,
+>             INT=INT.ARGTYPE
+>         ),
+>         Arguments=Opcodes.argdescr,
+>         Operands=operands
+>     )
+> }
+> @ %def bcinfo
+> 
+> 
+5161,5163c5191,5194
+< primarily useful for debugging the compiler.  A more readable output
+< representation might be nice to have. It would also probably make
+< sense to give the result a class and write a print method.
 ---
-> primarily useful for debugging the compiler.  A more readable output
-> representation might be nice to have. It would also probably make
-> sense to give the result a class and write a print method.
-5211,5214c5180
-<     
-<     d <- disasm(.Internal(disassemble(code)))
-<     class(d) <- "disassembly"
-<     d
+> primarily useful for debugging the compiler. It returns parsed 
+> internal representation of bytecode with class "disassembly".
+> The print method for this class which is implemented in the 
+> bctools package.
+5180c5211,5214
+<     dput(disasm(.Internal(disassemble(code))))
 ---
->     dput(disasm(.Internal(disassemble(code))))
-5939,6074c5905,6030
-< 
-< \subsection{Instruction argument description and count}
-< <<opcode argument description>>=
-< 
-< SKIP.ARGTYPE<--1
-< LABEL.ARGTYPE<-0
-< CONSTANTS.ARGTYPE<-3
-< CONSTANTS_DBG.ARGTYPE<-4
-< BOOL.ARGTYPE<-11
-< INT.ARGTYPE<-10
-< 
-< Opcodes.argdescr <- list(
-< 
-< BCMISMATCH.OP = c(),
-< RETURN.OP = c(),
-< GOTO.OP = c(LABEL.ARGTYPE),
-< BRIFNOT.OP = c(CONSTANTS.ARGTYPE,LABEL.ARGTYPE),
-< POP.OP = c(),
-< DUP.OP = c(),
-< PRINTVALUE.OP = c(),
-< STARTLOOPCNTXT.OP = c(BOOL.ARGTYPE, LABEL.ARGTYPE),#  bool is_for_loop, pc for break
-< ENDLOOPCNTXT.OP = c(BOOL.ARGTYPE),
-< DOLOOPNEXT.OP = c(),
-< DOLOOPBREAK.OP = c(),
-< STARTFOR.OP = c(CONSTANTS_DBG.ARGTYPE, CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
-< STEPFOR.OP = c(LABEL.ARGTYPE),
-< ENDFOR.OP = c(),
-< SETLOOPVAL.OP = c(),
-< INVISIBLE.OP = c(),
-< LDCONST.OP = c(CONSTANTS.ARGTYPE),
-< LDNULL.OP = c(),
-< LDTRUE.OP = c(),
-< LDFALSE.OP = c(),
-< GETVAR.OP = c(CONSTANTS.ARGTYPE),
-< DDVAL.OP = c(CONSTANTS.ARGTYPE),
-< SETVAR.OP = c(CONSTANTS.ARGTYPE),
-< GETFUN.OP = c(CONSTANTS.ARGTYPE),
-< GETGLOBFUN.OP = c(CONSTANTS.ARGTYPE),
-< GETSYMFUN.OP = c(CONSTANTS.ARGTYPE),
-< GETBUILTIN.OP = c(CONSTANTS.ARGTYPE),
-< GETINTLBUILTIN.OP = c(CONSTANTS.ARGTYPE),
-< CHECKFUN.OP = c(),
-< MAKEPROM.OP = c(CONSTANTS.ARGTYPE),
-< DOMISSING.OP = c(),
-< SETTAG.OP = c(CONSTANTS.ARGTYPE),
-< DODOTS.OP = c(),
-< PUSHARG.OP = c(),
-< PUSHCONSTARG.OP = c(CONSTANTS.ARGTYPE),
-< PUSHNULLARG.OP = c(),
-< PUSHTRUEARG.OP = c(),
-< PUSHFALSEARG.OP = c(),
-< CALL.OP = c(CONSTANTS.ARGTYPE),
-< CALLBUILTIN.OP = c(CONSTANTS.ARGTYPE),
-< CALLSPECIAL.OP = c(CONSTANTS.ARGTYPE),
-< MAKECLOSURE.OP = c(CONSTANTS.ARGTYPE),
-< UMINUS.OP = c(CONSTANTS_DBG.ARGTYPE),
-< UPLUS.OP = c(CONSTANTS_DBG.ARGTYPE),
-< ADD.OP = c(CONSTANTS_DBG.ARGTYPE),
-< SUB.OP = c(CONSTANTS_DBG.ARGTYPE),
-< MUL.OP = c(CONSTANTS_DBG.ARGTYPE),
-< DIV.OP = c(CONSTANTS_DBG.ARGTYPE),
-< EXPT.OP = c(CONSTANTS_DBG.ARGTYPE),
-< SQRT.OP = c(CONSTANTS_DBG.ARGTYPE),
-< EXP.OP = c(CONSTANTS_DBG.ARGTYPE),
-< EQ.OP = c(CONSTANTS_DBG.ARGTYPE),
-< NE.OP = c(CONSTANTS_DBG.ARGTYPE),
-< LT.OP = c(CONSTANTS_DBG.ARGTYPE),
-< LE.OP = c(CONSTANTS_DBG.ARGTYPE),
-< GE.OP = c(CONSTANTS_DBG.ARGTYPE),
-< GT.OP = c(CONSTANTS_DBG.ARGTYPE),
-< AND.OP = c(CONSTANTS_DBG.ARGTYPE),
-< OR.OP = c(CONSTANTS_DBG.ARGTYPE),
-< NOT.OP = c(CONSTANTS_DBG.ARGTYPE),
-< DOTSERR.OP = c(),
-< STARTASSIGN.OP = c(CONSTANTS.ARGTYPE),
-< ENDASSIGN.OP = c(CONSTANTS.ARGTYPE),
-< STARTSUBSET.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
-< DFLTSUBSET.OP = c(),
-< STARTSUBASSIGN.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
-< DFLTSUBASSIGN.OP = c(),
-< STARTC.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
-< DFLTC.OP = c(),
-< STARTSUBSET2.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
-< DFLTSUBSET2.OP = c(),
-< STARTSUBASSIGN2.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
-< DFLTSUBASSIGN2.OP = c(),
-< DOLLAR.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
-< DOLLARGETS.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
-< ISNULL.OP = c(),
-< ISLOGICAL.OP = c(),
-< ISINTEGER.OP = c(),
-< ISDOUBLE.OP = c(),
-< ISCOMPLEX.OP = c(),
-< ISCHARACTER.OP = c(),
-< ISSYMBOL.OP = c(),
-< ISOBJECT.OP = c(),
-< ISNUMERIC.OP = c(),
-< VECSUBSET.OP = c(CONSTANTS.ARGTYPE),
-< MATSUBSET.OP = c(CONSTANTS.ARGTYPE),
-< VECSUBASSIGN.OP = c(CONSTANTS.ARGTYPE),
-< MATSUBASSIGN.OP = c(CONSTANTS.ARGTYPE),
-< AND1ST.OP = c(CONSTANTS_DBG.ARGTYPE, LABEL.ARGTYPE),
-< AND2ND.OP = c(CONSTANTS_DBG.ARGTYPE),
-< OR1ST.OP = c(CONSTANTS_DBG.ARGTYPE, LABEL.ARGTYPE),
-< OR2ND.OP = c(CONSTANTS_DBG.ARGTYPE),
-< GETVAR_MISSOK.OP = c(CONSTANTS.ARGTYPE),
-< DDVAL_MISSOK.OP = c(CONSTANTS.ARGTYPE),
-< VISIBLE.OP = c(),
-< SETVAR2.OP = c(CONSTANTS.ARGTYPE),
-< STARTASSIGN2.OP = c(CONSTANTS.ARGTYPE),
-< ENDASSIGN2.OP = c(CONSTANTS.ARGTYPE),
-< SETTER_CALL.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
-< GETTER_CALL.OP = c(CONSTANTS.ARGTYPE),
-< SWAP.OP = c(),
-< DUP2ND.OP = c(),
-< SWITCH.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
-< RETURNJMP.OP = c(),
-< STARTSUBSET_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
-< STARTSUBASSIGN_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
-< VECSUBSET2.OP = c(CONSTANTS.ARGTYPE),
-< MATSUBSET2.OP = c(CONSTANTS.ARGTYPE),
-< VECSUBASSIGN2.OP = c(CONSTANTS.ARGTYPE),
-< MATSUBASSIGN2.OP = c(CONSTANTS.ARGTYPE),
-< STARTSUBSET2_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
-< STARTSUBASSIGN2_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
-< SUBSET_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
-< SUBSET2_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
-< SUBASSIGN_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
-< SUBASSIGN2_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
-< LOG.OP = c(CONSTANTS.ARGTYPE),
-< LOGBASE.OP = c(CONSTANTS.ARGTYPE),
-< MATH1.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE), #second argument is one of the math1funs
-< DOTCALL.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
-< COLON.OP = c(SKIP.ARGTYPE),
-< SEQALONG.OP = c(SKIP.ARGTYPE),
-< SEQLEN.OP = c(SKIP.ARGTYPE)
+>     
+>     d <- disasm(.Internal(disassemble(code)))
+>     class(d) <- "disassembly"
+>     d
+5905,6030c5939,6074
+< \subsection{Instruction argument counts and names}
+< <<opcode argument counts>>=
+< Opcodes.argc <- list(
+< BCMISMATCH.OP = 0,
+< RETURN.OP = 0,
+< GOTO.OP = 1,
+< BRIFNOT.OP = 2,
+< POP.OP = 0,
+< DUP.OP = 0,
+< PRINTVALUE.OP = 0,
+< STARTLOOPCNTXT.OP = 2,
+< ENDLOOPCNTXT.OP = 1,
+< DOLOOPNEXT.OP = 0,
+< DOLOOPBREAK.OP = 0,
+< STARTFOR.OP = 3,
+< STEPFOR.OP = 1,
+< ENDFOR.OP = 0,
+< SETLOOPVAL.OP = 0,
+< INVISIBLE.OP = 0,
+< LDCONST.OP = 1,
+< LDNULL.OP = 0,
+< LDTRUE.OP = 0,
+< LDFALSE.OP = 0,
+< GETVAR.OP = 1,
+< DDVAL.OP = 1,
+< SETVAR.OP = 1,
+< GETFUN.OP = 1,
+< GETGLOBFUN.OP = 1,
+< GETSYMFUN.OP = 1,
+< GETBUILTIN.OP = 1,
+< GETINTLBUILTIN.OP = 1,
+< CHECKFUN.OP = 0,
+< MAKEPROM.OP = 1,
+< DOMISSING.OP = 0,
+< SETTAG.OP = 1,
+< DODOTS.OP = 0,
+< PUSHARG.OP = 0,
+< PUSHCONSTARG.OP = 1,
+< PUSHNULLARG.OP = 0,
+< PUSHTRUEARG.OP = 0,
+< PUSHFALSEARG.OP = 0,
+< CALL.OP = 1,
+< CALLBUILTIN.OP = 1,
+< CALLSPECIAL.OP = 1,
+< MAKECLOSURE.OP = 1,
+< UMINUS.OP = 1,
+< UPLUS.OP = 1,
+< ADD.OP = 1,
+< SUB.OP = 1,
+< MUL.OP = 1,
+< DIV.OP = 1,
+< EXPT.OP = 1,
+< SQRT.OP = 1,
+< EXP.OP = 1,
+< EQ.OP = 1,
+< NE.OP = 1,
+< LT.OP = 1,
+< LE.OP = 1,
+< GE.OP = 1,
+< GT.OP = 1,
+< AND.OP = 1,
+< OR.OP = 1,
+< NOT.OP = 1,
+< DOTSERR.OP = 0,
+< STARTASSIGN.OP = 1,
+< ENDASSIGN.OP = 1,
+< STARTSUBSET.OP = 2,
+< DFLTSUBSET.OP = 0,
+< STARTSUBASSIGN.OP = 2,
+< DFLTSUBASSIGN.OP = 0,
+< STARTC.OP = 2,
+< DFLTC.OP = 0,
+< STARTSUBSET2.OP = 2,
+< DFLTSUBSET2.OP = 0,
+< STARTSUBASSIGN2.OP = 2,
+< DFLTSUBASSIGN2.OP = 0,
+< DOLLAR.OP = 2,
+< DOLLARGETS.OP = 2,
+< ISNULL.OP = 0,
+< ISLOGICAL.OP = 0,
+< ISINTEGER.OP = 0,
+< ISDOUBLE.OP = 0,
+< ISCOMPLEX.OP = 0,
+< ISCHARACTER.OP = 0,
+< ISSYMBOL.OP = 0,
+< ISOBJECT.OP = 0,
+< ISNUMERIC.OP = 0,
+< VECSUBSET.OP = 1,
+< MATSUBSET.OP = 1,
+< VECSUBASSIGN.OP = 1,
+< MATSUBASSIGN.OP = 1,
+< AND1ST.OP = 2,
+< AND2ND.OP = 1,
+< OR1ST.OP = 2,
+< OR2ND.OP = 1,
+< GETVAR_MISSOK.OP = 1,
+< DDVAL_MISSOK.OP = 1,
+< VISIBLE.OP = 0,
+< SETVAR2.OP = 1,
+< STARTASSIGN2.OP = 1,
+< ENDASSIGN2.OP = 1,
+< SETTER_CALL.OP = 2,
+< GETTER_CALL.OP = 1,
+< SWAP.OP = 0,
+< DUP2ND.OP = 0,
+< SWITCH.OP = 4,
+< RETURNJMP.OP = 0,
+< STARTSUBSET_N.OP = 2,
+< STARTSUBASSIGN_N.OP = 2,
+< VECSUBSET2.OP = 1,
+< MATSUBSET2.OP = 1,
+< VECSUBASSIGN2.OP = 1,
+< MATSUBASSIGN2.OP = 1,
+< STARTSUBSET2_N.OP = 2,
+< STARTSUBASSIGN2_N.OP = 2,
+< SUBSET_N.OP = 2,
+< SUBSET2_N.OP = 2,
+< SUBASSIGN_N.OP = 2,
+< SUBASSIGN2_N.OP = 2,
+< LOG.OP = 1,
+< LOGBASE.OP = 1,
+< MATH1.OP = 2,
+< DOTCALL.OP = 2,
+< COLON.OP = 1,
+< SEQALONG.OP = 1,
+< SEQLEN.OP = 1
 ---
-> \subsection{Instruction argument counts and names}
-> <<opcode argument counts>>=
-> Opcodes.argc <- list(
-> BCMISMATCH.OP = 0,
-> RETURN.OP = 0,
-> GOTO.OP = 1,
-> BRIFNOT.OP = 2,
-> POP.OP = 0,
-> DUP.OP = 0,
-> PRINTVALUE.OP = 0,
-> STARTLOOPCNTXT.OP = 2,
-> ENDLOOPCNTXT.OP = 1,
-> DOLOOPNEXT.OP = 0,
-> DOLOOPBREAK.OP = 0,
-> STARTFOR.OP = 3,
-> STEPFOR.OP = 1,
-> ENDFOR.OP = 0,
-> SETLOOPVAL.OP = 0,
-> INVISIBLE.OP = 0,
-> LDCONST.OP = 1,
-> LDNULL.OP = 0,
-> LDTRUE.OP = 0,
-> LDFALSE.OP = 0,
-> GETVAR.OP = 1,
-> DDVAL.OP = 1,
-> SETVAR.OP = 1,
-> GETFUN.OP = 1,
-> GETGLOBFUN.OP = 1,
-> GETSYMFUN.OP = 1,
-> GETBUILTIN.OP = 1,
-> GETINTLBUILTIN.OP = 1,
-> CHECKFUN.OP = 0,
-> MAKEPROM.OP = 1,
-> DOMISSING.OP = 0,
-> SETTAG.OP = 1,
-> DODOTS.OP = 0,
-> PUSHARG.OP = 0,
-> PUSHCONSTARG.OP = 1,
-> PUSHNULLARG.OP = 0,
-> PUSHTRUEARG.OP = 0,
-> PUSHFALSEARG.OP = 0,
-> CALL.OP = 1,
-> CALLBUILTIN.OP = 1,
-> CALLSPECIAL.OP = 1,
-> MAKECLOSURE.OP = 1,
-> UMINUS.OP = 1,
-> UPLUS.OP = 1,
-> ADD.OP = 1,
-> SUB.OP = 1,
-> MUL.OP = 1,
-> DIV.OP = 1,
-> EXPT.OP = 1,
-> SQRT.OP = 1,
-> EXP.OP = 1,
-> EQ.OP = 1,
-> NE.OP = 1,
-> LT.OP = 1,
-> LE.OP = 1,
-> GE.OP = 1,
-> GT.OP = 1,
-> AND.OP = 1,
-> OR.OP = 1,
-> NOT.OP = 1,
-> DOTSERR.OP = 0,
-> STARTASSIGN.OP = 1,
-> ENDASSIGN.OP = 1,
-> STARTSUBSET.OP = 2,
-> DFLTSUBSET.OP = 0,
-> STARTSUBASSIGN.OP = 2,
-> DFLTSUBASSIGN.OP = 0,
-> STARTC.OP = 2,
-> DFLTC.OP = 0,
-> STARTSUBSET2.OP = 2,
-> DFLTSUBSET2.OP = 0,
-> STARTSUBASSIGN2.OP = 2,
-> DFLTSUBASSIGN2.OP = 0,
-> DOLLAR.OP = 2,
-> DOLLARGETS.OP = 2,
-> ISNULL.OP = 0,
-> ISLOGICAL.OP = 0,
-> ISINTEGER.OP = 0,
-> ISDOUBLE.OP = 0,
-> ISCOMPLEX.OP = 0,
-> ISCHARACTER.OP = 0,
-> ISSYMBOL.OP = 0,
-> ISOBJECT.OP = 0,
-> ISNUMERIC.OP = 0,
-> VECSUBSET.OP = 1,
-> MATSUBSET.OP = 1,
-> VECSUBASSIGN.OP = 1,
-> MATSUBASSIGN.OP = 1,
-> AND1ST.OP = 2,
-> AND2ND.OP = 1,
-> OR1ST.OP = 2,
-> OR2ND.OP = 1,
-> GETVAR_MISSOK.OP = 1,
-> DDVAL_MISSOK.OP = 1,
-> VISIBLE.OP = 0,
-> SETVAR2.OP = 1,
-> STARTASSIGN2.OP = 1,
-> ENDASSIGN2.OP = 1,
-> SETTER_CALL.OP = 2,
-> GETTER_CALL.OP = 1,
-> SWAP.OP = 0,
-> DUP2ND.OP = 0,
-> SWITCH.OP = 4,
-> RETURNJMP.OP = 0,
-> STARTSUBSET_N.OP = 2,
-> STARTSUBASSIGN_N.OP = 2,
-> VECSUBSET2.OP = 1,
-> MATSUBSET2.OP = 1,
-> VECSUBASSIGN2.OP = 1,
-> MATSUBASSIGN2.OP = 1,
-> STARTSUBSET2_N.OP = 2,
-> STARTSUBASSIGN2_N.OP = 2,
-> SUBSET_N.OP = 2,
-> SUBSET2_N.OP = 2,
-> SUBASSIGN_N.OP = 2,
-> SUBASSIGN2_N.OP = 2,
-> LOG.OP = 1,
-> LOGBASE.OP = 1,
-> MATH1.OP = 2,
-> DOTCALL.OP = 2,
-> COLON.OP = 1,
-> SEQALONG.OP = 1,
-> SEQLEN.OP = 1
-6076,6078c6032
-< 
-< Opcodes.argc <- lapply(Opcodes.argdescr, length)
-< @
+> 
+> \subsection{Instruction argument description and count}
+> <<opcode argument description>>=
+> 
+> SKIP.ARGTYPE<--1
+> LABEL.ARGTYPE<-0
+> CONSTANTS.ARGTYPE<-3
+> CONSTANTS_DBG.ARGTYPE<-4
+> BOOL.ARGTYPE<-11
+> INT.ARGTYPE<-10
+> 
+> Opcodes.argdescr <- list(
+> 
+> BCMISMATCH.OP = c(),
+> RETURN.OP = c(),
+> GOTO.OP = c(LABEL.ARGTYPE),
+> BRIFNOT.OP = c(CONSTANTS.ARGTYPE,LABEL.ARGTYPE),
+> POP.OP = c(),
+> DUP.OP = c(),
+> PRINTVALUE.OP = c(),
+> STARTLOOPCNTXT.OP = c(BOOL.ARGTYPE, LABEL.ARGTYPE),#  bool is_for_loop, pc for break
+> ENDLOOPCNTXT.OP = c(BOOL.ARGTYPE),
+> DOLOOPNEXT.OP = c(),
+> DOLOOPBREAK.OP = c(),
+> STARTFOR.OP = c(CONSTANTS_DBG.ARGTYPE, CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+> STEPFOR.OP = c(LABEL.ARGTYPE),
+> ENDFOR.OP = c(),
+> SETLOOPVAL.OP = c(),
+> INVISIBLE.OP = c(),
+> LDCONST.OP = c(CONSTANTS.ARGTYPE),
+> LDNULL.OP = c(),
+> LDTRUE.OP = c(),
+> LDFALSE.OP = c(),
+> GETVAR.OP = c(CONSTANTS.ARGTYPE),
+> DDVAL.OP = c(CONSTANTS.ARGTYPE),
+> SETVAR.OP = c(CONSTANTS.ARGTYPE),
+> GETFUN.OP = c(CONSTANTS.ARGTYPE),
+> GETGLOBFUN.OP = c(CONSTANTS.ARGTYPE),
+> GETSYMFUN.OP = c(CONSTANTS.ARGTYPE),
+> GETBUILTIN.OP = c(CONSTANTS.ARGTYPE),
+> GETINTLBUILTIN.OP = c(CONSTANTS.ARGTYPE),
+> CHECKFUN.OP = c(),
+> MAKEPROM.OP = c(CONSTANTS.ARGTYPE),
+> DOMISSING.OP = c(),
+> SETTAG.OP = c(CONSTANTS.ARGTYPE),
+> DODOTS.OP = c(),
+> PUSHARG.OP = c(),
+> PUSHCONSTARG.OP = c(CONSTANTS.ARGTYPE),
+> PUSHNULLARG.OP = c(),
+> PUSHTRUEARG.OP = c(),
+> PUSHFALSEARG.OP = c(),
+> CALL.OP = c(CONSTANTS.ARGTYPE),
+> CALLBUILTIN.OP = c(CONSTANTS.ARGTYPE),
+> CALLSPECIAL.OP = c(CONSTANTS.ARGTYPE),
+> MAKECLOSURE.OP = c(CONSTANTS.ARGTYPE),
+> UMINUS.OP = c(CONSTANTS_DBG.ARGTYPE),
+> UPLUS.OP = c(CONSTANTS_DBG.ARGTYPE),
+> ADD.OP = c(CONSTANTS_DBG.ARGTYPE),
+> SUB.OP = c(CONSTANTS_DBG.ARGTYPE),
+> MUL.OP = c(CONSTANTS_DBG.ARGTYPE),
+> DIV.OP = c(CONSTANTS_DBG.ARGTYPE),
+> EXPT.OP = c(CONSTANTS_DBG.ARGTYPE),
+> SQRT.OP = c(CONSTANTS_DBG.ARGTYPE),
+> EXP.OP = c(CONSTANTS_DBG.ARGTYPE),
+> EQ.OP = c(CONSTANTS_DBG.ARGTYPE),
+> NE.OP = c(CONSTANTS_DBG.ARGTYPE),
+> LT.OP = c(CONSTANTS_DBG.ARGTYPE),
+> LE.OP = c(CONSTANTS_DBG.ARGTYPE),
+> GE.OP = c(CONSTANTS_DBG.ARGTYPE),
+> GT.OP = c(CONSTANTS_DBG.ARGTYPE),
+> AND.OP = c(CONSTANTS_DBG.ARGTYPE),
+> OR.OP = c(CONSTANTS_DBG.ARGTYPE),
+> NOT.OP = c(CONSTANTS_DBG.ARGTYPE),
+> DOTSERR.OP = c(),
+> STARTASSIGN.OP = c(CONSTANTS.ARGTYPE),
+> ENDASSIGN.OP = c(CONSTANTS.ARGTYPE),
+> STARTSUBSET.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+> DFLTSUBSET.OP = c(),
+> STARTSUBASSIGN.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+> DFLTSUBASSIGN.OP = c(),
+> STARTC.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+> DFLTC.OP = c(),
+> STARTSUBSET2.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+> DFLTSUBSET2.OP = c(),
+> STARTSUBASSIGN2.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+> DFLTSUBASSIGN2.OP = c(),
+> DOLLAR.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
+> DOLLARGETS.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
+> ISNULL.OP = c(),
+> ISLOGICAL.OP = c(),
+> ISINTEGER.OP = c(),
+> ISDOUBLE.OP = c(),
+> ISCOMPLEX.OP = c(),
+> ISCHARACTER.OP = c(),
+> ISSYMBOL.OP = c(),
+> ISOBJECT.OP = c(),
+> ISNUMERIC.OP = c(),
+> VECSUBSET.OP = c(CONSTANTS.ARGTYPE),
+> MATSUBSET.OP = c(CONSTANTS.ARGTYPE),
+> VECSUBASSIGN.OP = c(CONSTANTS.ARGTYPE),
+> MATSUBASSIGN.OP = c(CONSTANTS.ARGTYPE),
+> AND1ST.OP = c(CONSTANTS_DBG.ARGTYPE, LABEL.ARGTYPE),
+> AND2ND.OP = c(CONSTANTS_DBG.ARGTYPE),
+> OR1ST.OP = c(CONSTANTS_DBG.ARGTYPE, LABEL.ARGTYPE),
+> OR2ND.OP = c(CONSTANTS_DBG.ARGTYPE),
+> GETVAR_MISSOK.OP = c(CONSTANTS.ARGTYPE),
+> DDVAL_MISSOK.OP = c(CONSTANTS.ARGTYPE),
+> VISIBLE.OP = c(),
+> SETVAR2.OP = c(CONSTANTS.ARGTYPE),
+> STARTASSIGN2.OP = c(CONSTANTS.ARGTYPE),
+> ENDASSIGN2.OP = c(CONSTANTS.ARGTYPE),
+> SETTER_CALL.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
+> GETTER_CALL.OP = c(CONSTANTS.ARGTYPE),
+> SWAP.OP = c(),
+> DUP2ND.OP = c(),
+> SWITCH.OP = c(CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE, CONSTANTS.ARGTYPE),
+> RETURNJMP.OP = c(),
+> STARTSUBSET_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+> STARTSUBASSIGN_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+> VECSUBSET2.OP = c(CONSTANTS.ARGTYPE),
+> MATSUBSET2.OP = c(CONSTANTS.ARGTYPE),
+> VECSUBASSIGN2.OP = c(CONSTANTS.ARGTYPE),
+> MATSUBASSIGN2.OP = c(CONSTANTS.ARGTYPE),
+> STARTSUBSET2_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+> STARTSUBASSIGN2_N.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE),
+> SUBSET_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
+> SUBSET2_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
+> SUBASSIGN_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
+> SUBASSIGN2_N.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
+> LOG.OP = c(CONSTANTS.ARGTYPE),
+> LOGBASE.OP = c(CONSTANTS.ARGTYPE),
+> MATH1.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE), #second argument is one of the math1funs
+> DOTCALL.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
+> COLON.OP = c(SKIP.ARGTYPE),
+> SEQALONG.OP = c(SKIP.ARGTYPE),
+> SEQLEN.OP = c(SKIP.ARGTYPE)
+6032c6076,6078
+< @ 
 ---
-> @ 
-6226c6180
-< <<opcode argument description>>
+> 
+> Opcodes.argc <- lapply(Opcodes.argdescr, length)
+> @
+6180c6226
+< <<opcode argument counts>>
 ---
-> <<opcode argument counts>>
-6599,6600d6552
-< 
-< <<[[bcinfo]] function>> 
+> <<opcode argument description>>
+6552a6599,6600
+> 
+> <<[[bcinfo]] function>>
