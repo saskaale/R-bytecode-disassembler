@@ -71,10 +71,31 @@ sf <- function(x) {
         s <- s + y
     s
 }
+switchf <- function(type) {
+ switch(type,
+        mean = 1,
+        median = 2,
+        trimmed = 3)
+}
+closuref <- function(){
+    f <- (function(){
+        v <- 12
+        function(){
+            v * 10
+        }
+    })()
+
+    f()+1
+}
+
+
+
+
 src <- cmpfun(sr)
 swc <- cmpfun(sw)
 sfc <- cmpfun(sf)
-
+switchfc <- cmpfun(switchf)
+closurefc <- cmpfun(closuref)
 
 out <- getOutput(src)
 code <- c("GETFUN length", "MAKEPROM <INTERNAL_FUNCTION>", "CALL length(x)", 
@@ -85,7 +106,7 @@ code <- c("GETFUN length", "MAKEPROM <INTERNAL_FUNCTION>", "CALL length(x)",
         "4:", "ADD", "SETVAR s", "POP", "GETVAR i", "LDCONST 1", "ADD", 
         "SETVAR i", "POP", "GOTO $1", "5:", "LDNULL", "POP", "GETVAR s", 
         "RETURN");
-stopifnot(eqOut(operands(out), code));
+stopifnot(eqOut(operands(out), code))
 
 
 out <- getOutput(swc)
@@ -96,11 +117,26 @@ code <- c("GETFUN length", "MAKEPROM <INTERNAL_FUNCTION>", "CALL length(x)",
         "VECSUBSET x[i]", "2:", "ADD", "SETVAR s", "POP", "GETVAR i", 
         "LDCONST 1", "ADD", "SETVAR i", "POP", "GOTO $1", "3:", "LDNULL", 
         "POP", "GETVAR s", "RETURN")
-stopifnot(eqOut(operands(out), code));
+stopifnot(eqOut(operands(out), code))
 
 
 out <- getOutput(sfc)
 code <- c("LDCONST 0", "SETVAR s", "POP", "GETVAR x", "STARTFOR y | $2", 
         "1:", "GETVAR s", "GETVAR y", "ADD", "SETVAR s", "POP", "2:", 
         "STEPFOR $1", "ENDFOR", "POP", "GETVAR s", "RETURN")
-stopifnot(eqOut(operands(out), code));
+stopifnot(eqOut(operands(out), code))
+
+out <- getOutput(switchfc)
+code <- c("GETVAR type", "SWITCH switch(type, mean = 1, median = 2, trimmed = 3) | c(\"mean\", \"median\", \"trimmed\", \"\") | c(11L, 14L, 17L, 8L) | c(11L, 14L, 17L, 8L)", 
+        "LDNULL", "INVISIBLE", "RETURN", "LDCONST 1", "RETURN", "LDCONST 2", 
+        "RETURN", "LDCONST 3", "RETURN")
+stopifnot(eqOut(operands(out), code))
+
+
+out <- getOutput(closurefc)
+code <- c("MAKECLOSURE <FUNCTION>", "LDCONST 12", "SETVAR v", "POP", 
+        "MAKECLOSURE <FUNCTION>", "GETVAR v", "LDCONST 10", "MUL", "RETURN", 
+        "RETURN", "CHECKFUN", "CALL (function() { v <- 12 function() { v * 10 } })()", 
+        "SETVAR f", "POP", "GETFUN f", "CALL f()", "LDCONST 1", "ADD", 
+        "RETURN")
+stopifnot(eqOut(operands(out), code))
