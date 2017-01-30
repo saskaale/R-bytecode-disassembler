@@ -4,6 +4,6 @@ Version: 0.1.0
 Priority: NA
 Title: The R ByteCode Tools Package
 Author: Ales Saska <mail@alessaska.cz>
-Maintainer: R Core Team <R-core@r-project.org>
+Maintainer: Ales Saska <mail@alessaska.cz>
 Description: Tools for Byte code in R.
-License: Part of R 3.4.0
+License: GPL-2
