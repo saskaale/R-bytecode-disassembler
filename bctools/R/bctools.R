@@ -4,7 +4,40 @@ BCINFO=bcinfo();
 argtypes = BCINFO$Argtypes
 Opcodes.argdescr <- BCINFO$Arguments;
 
-print.disassembly <- function(x, prefix=1, verbose=0, maxdepth=3, deph=0, ...){
+
+#' Print bytecode object to output and returns it \emph{invisibly} (via \code{\link{invisible}(x)})
+#'
+#' \code{print.disassembly} print bytecode object into output in human-friendly way.
+#'
+#' This is implementation of print method for bytecode object. 
+#' It works under internal R Bytecode structure.
+#'
+#' @param x Bytecode object to be printed
+#' @param prefix number of spaces to print before each line ( used for intendation )
+#' @param verbose verbosity level ( 0 or 1 or 2)
+#' @param maxdepth Maximum depth of nested functions which are printed
+#' @param depth Current depth of nested functions which are being printed ( used for internal purposes in print recursion )
+#' @param ... Numeric, complex, or logical vectors.
+#'
+#' @examples
+#' library(compiler)
+#' library(bctools)
+#' a <- function(x){
+#'   r <- 1
+#'   while(x){
+#'     r = r + x*x
+#'     x = x-1
+#'   }
+#'   r
+#' }
+#' bc <- compiler::cmpfun(a)
+#'
+#' print(compiler::disassemble(bc));
+#' print(compiler::disassemble(bc), verbose=1);
+#' print(compiler::disassemble(bc), verbose=2);
+#'
+
+print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...){
     constants <- x[[3]]
     code <- x[[2]]
 
@@ -88,11 +121,11 @@ print.disassembly <- function(x, prefix=1, verbose=0, maxdepth=3, deph=0, ...){
     dumpConstant<-function(v){
         v <- constants[[v+1]]
         if(typeof(v) == "list"){
-            if(deph < maxdepth){
+            if(depth < maxdepth){
                 if(typeof(v[[2]]) == "bytecode"){
                     v <- compiler::disassemble(v[[2]])
                     cat("<FUNCTION>")
-                    print.disassembly(v, paste0(prefix,"   "),verbose=verbose, maxdepth = maxdepth, deph=deph+1)
+                    print.disassembly(v, paste0(prefix,"   "),verbose=verbose, maxdepth = maxdepth, depth=depth+1)
                     cat("\n")
                 }else{
                     cat("<INTERNAL_FUNCTION>")
@@ -207,4 +240,5 @@ print.disassembly <- function(x, prefix=1, verbose=0, maxdepth=3, deph=0, ...){
         i<-i+1
     }
     cat("\n")
+    invisible(x)
 }

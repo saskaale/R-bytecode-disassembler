@@ -7,3 +7,7 @@ Author: Ales Saska <mail@alessaska.cz>
 Maintainer: Ales Saska <mail@alessaska.cz>
 Description: Tools for Byte code in R.
 License: GPL-2
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 6.0.0
