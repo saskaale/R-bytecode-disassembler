@@ -1,11 +1,10 @@
-##diff ./compiler_old.nw ./compiler.nw
-5158a5159,5188
+5220a5221,5248
 > \subsection{Bytecode info}
 > Infomation about bytecode is provided by [[bcinfo]]. 
 > This is useful to get definition all instrutions numbers, and their arguments.
 > <<[[bcinfo]] function>>=
 > bcinfo <- function() {
-> 
+>  
 >     operands <- setNames(
 >                     lapply(
 >                         Opcodes.names,
@@ -28,9 +27,7 @@
 >     )
 > }
 > @ %def bcinfo
-> 
-> 
-5161,5163c5191,5194
+5224,5226c5252,5255
 < primarily useful for debugging the compiler.  A more readable output
 < representation might be nice to have. It would also probably make
 < sense to give the result a class and write a print method.
@@ -39,14 +36,13 @@
 > internal representation of bytecode with class "disassembly".
 > The print method for this class which is implemented in the 
 > bctools package.
-5180c5211,5214
+5243c5272,5274
 <     dput(disasm(.Internal(disassemble(code))))
 ---
->     
 >     d <- disasm(.Internal(disassemble(code)))
 >     class(d) <- "disassembly"
 >     d
-5905,6030c5939,6074
+5969,6095c6000,6135
 < \subsection{Instruction argument counts and names}
 < <<opcode argument counts>>=
 < Opcodes.argc <- list(
@@ -172,9 +168,9 @@
 < DOTCALL.OP = 2,
 < COLON.OP = 1,
 < SEQALONG.OP = 1,
-< SEQLEN.OP = 1
+< SEQLEN.OP = 1,
+< BASEGUARD.OP = 2
 ---
-> 
 > \subsection{Instruction argument description and count}
 > <<opcode argument description>>=
 > 
@@ -309,17 +305,20 @@
 > DOTCALL.OP = c(CONSTANTS.ARGTYPE, INT.ARGTYPE),
 > COLON.OP = c(SKIP.ARGTYPE),
 > SEQALONG.OP = c(SKIP.ARGTYPE),
-> SEQLEN.OP = c(SKIP.ARGTYPE)
-6032c6076,6078
-< @ 
----
-> 
+> SEQLEN.OP = c(SKIP.ARGTYPE),
+> BASEGUARD.OP = c(CONSTANTS.ARGTYPE, LABEL.ARGTYPE)
+6098a6139,6143
+> <<opcode argument count>>=
 > Opcodes.argc <- lapply(Opcodes.argdescr, length)
-> @
-6180c6226
+> @ %def Opcodes.argc
+> 
+> 
+6245c6290,6292
 < <<opcode argument counts>>
 ---
 > <<opcode argument description>>
-6552a6599,6600
+> 
+> <<opcode argument count>>
+6628a6676,6677
 > 
 > <<[[bcinfo]] function>>
