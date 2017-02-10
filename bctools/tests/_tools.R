@@ -1,6 +1,8 @@
 library(compiler)
 library(bctools)
 
+enableJIT(0)
+
 getOutput <- function(bc, verbose=0){
     capture.output(print(compiler::disassemble(bc), verbose=verbose))
 }
