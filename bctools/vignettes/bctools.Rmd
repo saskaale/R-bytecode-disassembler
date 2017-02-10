@@ -11,69 +11,40 @@ vignette: >
 
 # bctools package
 
-This package contains pretty printer for R language Bytecode
+This package contains pretty printer for R language Bytecode. It can be used for debugging purposes and for code analysis. It defines print method for bytecode object ( which is used internally by R language ).
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+Print function support 3 levels of verbosity ( parameter verbose=0/1/2 ).
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+* verbose=0 - Print only source references ( if they are available )
+* verbose=1 - Print both source and expression references ( if they are available ) and also print bytecode version
+* verbose=2 - Print all operands' arguments ( including ones used just for debugging )
 
-## Vignette Info
+## Output description
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+* labels starts with 1:, 2: ... ( references to them begins with $ - $1 / $2 ... ).
+* expression references begins with @
+* source references with # ( if you want to be sure there are source references in bytecode included, call options(keep.source = TRUE) )
 
-## Styles
+## Examples
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+This is short example how to use the print method for bytecode object.
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figure
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
-```
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-#```{r, echo=FALSE, results='asis'}
 ```{r}
 
 library(compiler)
 library(bctools)
 
-f <- function(x){ x+2 }
+f <- function(x){
+    sum <- 0
+    while(x > 0){
+        sum <- sum + x
+    }
+    sum
+}
 
-cmp <- compiler::cmpfun(f);
-print(compiler::disassemble(cmp));
+bytecode <- compiler::cmpfun(f);
+
+print(compiler::disassemble(bytecode));
+
 
 ```
-
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
-
-To use this package, just
-
-#```{r}
-# Add two numbers together
-#add <- function(a, b) a + b
-#add(10, 20)
-#```
