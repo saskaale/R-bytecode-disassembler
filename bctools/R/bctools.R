@@ -15,6 +15,9 @@ Opcodes.argdescr <- BCINFO$Arguments;
 #' @param x Bytecode object to be printed
 #' @param prefix number of spaces to print before each line ( used for intendation )
 #' @param verbose verbosity level ( 0 or 1 or 2)
+#'             0 - display only source references ( if they are available )
+#'             1 - display both source and expression references ( if they are available )
+#'             2 - display every operand's argument ( including ones used just for debugging )
 #' @param maxdepth Maximum depth of nested functions which are printed
 #' @param depth Current depth of nested functions which are being printed ( used for internal purposes in print recursion )
 #' @param ... Numeric, complex, or logical vectors.
@@ -36,10 +39,15 @@ Opcodes.argdescr <- BCINFO$Arguments;
 #' print(compiler::disassemble(bc), verbose=1);
 #' print(compiler::disassemble(bc), verbose=2);
 #'
+#' @export
 
 print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...){
     constants <- x[[3]]
     code <- x[[2]]
+
+    srcrefsIndex <- NULL
+    expressionsIndex <- NULL
+    srcref <- NULL
 
 
     for (cnst in rev(constants)){
@@ -48,11 +56,12 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
       if (class(cnst)=="srcref")           srcref <- cnst
     }
 
-    dumpExpressions <- verbose > 0 && exists("expressionsIndex") && exists("srcrefsIndex");
-    dumpSrcrefs     <- exists("expressionsIndex") && exists("srcrefsIndex");
 
-    
+    dumpExpressions <- verbose > 0 && !is.null(expressionsIndex) && !is.null(srcrefsIndex);
+    dumpSrcrefs     <- !is.null(expressionsIndex) && !is.null(srcrefsIndex);
+
     #pre-process expressions index to find out last expression of each source expression
+    #there is need to preprocess the expressions 
     if(dumpExpressions || dumpSrcrefs){
         myExpressionsIndex <- rep(-1, length(expressionsIndex));
 
@@ -67,13 +76,12 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
                 lastExprIndex <- expressionsIndex[[i]]
             }
             myExpressionsIndex[[i]] <- lastExprIndex
-
             i <- i-1
         }
     }
 
     #print leading source reference
-    if(exists("srcref")){
+    if(!is.null(srcref)){
       environm <- attr(srcref, "srcfile")
       filename <- getSrcFilename(environm)
       if(!identical(filename, character(0))){
@@ -117,7 +125,6 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
         i<-i+1
     }
 
-    #third pass to print result
     dumpConstant<-function(v){
         v <- constants[[v+1]]
         if(typeof(v) == "list"){
@@ -157,6 +164,10 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
         cat(paste(v))
         TRUE
     }
+    dumpValue<-function(v){
+        cat(v)
+        TRUE
+    }
     dumpSrcRef<-function(cursrcref){
         filename <- getSrcFilename(cursrcref);
         lineno   <- getSrcLocation(cursrcref);
@@ -166,19 +177,21 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
         cat(paste0(prefix," - ",filename,"#",lineno,": ",o[[1]],"\n"))
         TRUE
     }
-    dumpValue<-function(v){
-        cat(v)
-        TRUE
+    dumpExprRef<-function(exprIndex){
+        cat(paste0(prefix,"  @ "))
+        dumpConstant(exprIndex)
+        cat("\n")
     }
-    lastExprIndex <- -1
 
+    #third pass to print result
+    lastExprIndex <- -1
     i <- 2
     while( i <= n ) {
         v <- code[[i]]
 
         cat("\n")
 
-        #print labels
+        #this instruction has label pointing to it
         if(labels[[i]] > 0){
             cat(paste0(prefix,labels[[i]],":\n"))
         }
@@ -192,20 +205,23 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
                     dumpSrcRef(cursrcref)
                 }
                 if(dumpExpressions){
-                    cat(paste0(prefix,"  @ "))
-                    dumpConstant(curExprIndex)
-                    cat("\n")
+                    dumpExprRef(curExprIndex)
                 }
 
                 lastExprIndex <- curExprIndex
             }
         }
 
+
+        #print prefix ( one of argument ) before each instruction
         cat(paste0(prefix,"  "))
+
+        #print instruction ( eg. ADD )
         dumpOp(v)
 
         argdescr <- Opcodes.argdescr[[paste0(v)]]
 
+        #iterate over each argument of instruction and print them
         j <- 1
         printed <- 0
         while(j <= length(argdescr)){
@@ -217,7 +233,6 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
             v <- code[[i]]
 
             t = argdescr[[j]]
-            
             if(t==argtypes$LABEL){
                 if(dumpLabel(v))
                     printed <- printed + 1
@@ -240,5 +255,7 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
         i<-i+1
     }
     cat("\n")
+
+    #returns invisible(x) as the default behavior of print method
     invisible(x)
 }

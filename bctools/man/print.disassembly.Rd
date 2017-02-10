@@ -12,7 +12,10 @@
 
 \item{prefix}{number of spaces to print before each line ( used for intendation )}
 
-\item{verbose}{verbosity level ( 0 or 1 or 2)}
+\item{verbose}{verbosity level ( 0 or 1 or 2)
+0 - display only source references ( if they are available )
+1 - display both source and expression references ( if they are available )
+2 - display every arguments ( including ones used just for debugging )}
 
 \item{maxdepth}{Maximum depth of nested functions which are printed}
 
