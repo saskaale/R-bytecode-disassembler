@@ -5,20 +5,23 @@ options(keep.source=TRUE)
 ## very minimal
 x <- 2
 
+
 out <- getOutput(compile(quote(x + 1)))
 code <- c("GETVAR x", 
         "LDCONST 1", 
         "ADD", 
-        "RETURN");
+        "RETURN")
 
-stopifnot(eqOut(operands(out), code));
+
+
+stopifnot(eqOut(operands(out), code))
 
 
 ## simple code generation
 
 f <- function(x) x
 
-out <- getOutput(compile( quote({f(1); f(2)})))
+out <- getOutput( compile( quote({f(1); f(2)}) ))
 code <- c("GETFUN f",
             "PUSHCONSTARG 1", 
             "CALL f(1)", 
@@ -26,21 +29,24 @@ code <- c("GETFUN f",
             "GETFUN f", 
             "PUSHCONSTARG 2", 
             "CALL f(2)", 
-            "RETURN");
+            "RETURN")
 
-stopifnot(eqOut(operands(out), code));
+stopifnot(eqOut(operands(out), code))
 
 
 ## names and ... args
 f <- function(...) list(...)
 
 out <- getOutput(cmpfun(f))
-code <- c("GETFUN list", 
+code <- c("BASEGUARD list(...) | $1",
+            "GETFUN list", 
             "DODOTS", 
             "CALL list(...)", 
-            "RETURN");
+            "RETURN", 
+            "1:", 
+            "RETURN")
 
-stopifnot(eqOut(operands(out), code));
+stopifnot(eqOut(operands(out), code))
 
 
 ## simple loops
@@ -98,24 +104,26 @@ switchfc <- cmpfun(switchf)
 closurefc <- cmpfun(closuref)
 
 out <- getOutput(src)
-code <- c("GETFUN length", "MAKEPROM <INTERNAL_FUNCTION>", "CALL length(x)", 
-        "SETVAR n", "POP", "LDCONST 1", "SETVAR i", "POP", "LDCONST 0", 
-        "SETVAR s", "POP", "1:", "GETVAR i", "GETVAR n", "GT", "BRIFNOT if (i > n) break | $2", 
-        "GOTO $5", "GOTO $3", "2:", "LDNULL", "3:", "POP", "GETVAR s", 
-        "GETVAR x", "STARTSUBSET_N x[i] | $4", "GETVAR_MISSOK i", "VECSUBSET x[i]", 
-        "4:", "ADD", "SETVAR s", "POP", "GETVAR i", "LDCONST 1", "ADD", 
-        "SETVAR i", "POP", "GOTO $1", "5:", "LDNULL", "POP", "GETVAR s", 
-        "RETURN");
+code <- c("BASEGUARD length(x) | $1", "GETBUILTIN length", "GETVAR x", 
+        "PUSHARG", "CALLBUILTIN length(x)", "1:", "SETVAR n", "POP", 
+        "LDCONST 1", "SETVAR i", "POP", "LDCONST 0", "SETVAR s", "POP", 
+        "2:", "GETVAR i", "GETVAR n", "GT", "BRIFNOT if (i > n) break | $3", 
+        "GOTO $6", "GOTO $4", "3:", "LDNULL", "4:", "POP", "GETVAR s", 
+        "GETVAR x", "STARTSUBSET_N x[i] | $5", "GETVAR_MISSOK i", "VECSUBSET x[i]", 
+        "5:", "ADD", "SETVAR s", "POP", "GETVAR i", "LDCONST 1", "ADD", 
+        "SETVAR i", "POP", "GOTO $2", "6:", "LDNULL", "POP", "GETVAR s", 
+        "RETURN")
 stopifnot(eqOut(operands(out), code))
 
 
 out <- getOutput(swc)
-code <- c("GETFUN length", "MAKEPROM <INTERNAL_FUNCTION>", "CALL length(x)", 
-        "SETVAR n", "POP", "LDCONST 1", "SETVAR i", "POP", "LDCONST 0", 
-        "SETVAR s", "POP", "1:", "GETVAR i", "GETVAR n", "LE", "BRIFNOT while (i <= n) { s <- s + x[i] i <- i + 1 } | $3", 
-        "GETVAR s", "GETVAR x", "STARTSUBSET_N x[i] | $2", "GETVAR_MISSOK i", 
-        "VECSUBSET x[i]", "2:", "ADD", "SETVAR s", "POP", "GETVAR i", 
-        "LDCONST 1", "ADD", "SETVAR i", "POP", "GOTO $1", "3:", "LDNULL", 
+code <- c("BASEGUARD length(x) | $1", "GETBUILTIN length", "GETVAR x", 
+        "PUSHARG", "CALLBUILTIN length(x)", "1:", "SETVAR n", "POP", 
+        "LDCONST 1", "SETVAR i", "POP", "LDCONST 0", "SETVAR s", "POP", 
+        "2:", "GETVAR i", "GETVAR n", "LE", "BRIFNOT while (i <= n) { s <- s + x[i] i <- i + 1 } | $4", 
+        "GETVAR s", "GETVAR x", "STARTSUBSET_N x[i] | $3", "GETVAR_MISSOK i", 
+        "VECSUBSET x[i]", "3:", "ADD", "SETVAR s", "POP", "GETVAR i", 
+        "LDCONST 1", "ADD", "SETVAR i", "POP", "GOTO $2", "4:", "LDNULL", 
         "POP", "GETVAR s", "RETURN")
 stopifnot(eqOut(operands(out), code))
 
