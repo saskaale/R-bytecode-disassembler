@@ -2,9 +2,7 @@ source("_tools.R")
 
 options(keep.source=TRUE)
 
-## labels
-
-# This is an example function
+## closures
 r <- function(){
     f <- (function(){
         v <- 12
