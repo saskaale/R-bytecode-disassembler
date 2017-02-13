@@ -16,8 +16,8 @@ Opcodes.argdescr <- BCINFO$Arguments;
 #' @param prefix number of spaces to print before each line ( used for intendation )
 #' @param verbose verbosity level ( 0 or 1 or 2)
 #'             0 - display only source references ( if they are available )
-#'             1 - display both source and expression references ( if they are available )
-#'             2 - display every operand's argument ( including ones used just for debugging )
+#'             1 - the same as 0 + display bytecode version and display expression references ( if they are available )
+#'             2 - the same as 1 + display every operand's argument ( including ones used just for debugging )
 #' @param maxdepth Maximum depth of nested functions which are printed
 #' @param depth Current depth of nested functions which are being printed ( used for internal purposes in print recursion )
 #' @param ... Numeric, complex, or logical vectors.
