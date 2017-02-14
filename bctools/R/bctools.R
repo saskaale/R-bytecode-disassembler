@@ -11,6 +11,7 @@ Opcodes.argdescr <- BCINFO$Arguments;
 #'
 #' This is implementation of print method for bytecode object. 
 #' It works under internal R Bytecode structure.
+#' You can manually create bytecode object through \emph{compiler} package ( via for example \code{\link{cmpfun}} function )
 #'
 #' @param x Bytecode object to be printed
 #' @param prefix number of spaces to print before each line ( used for intendation )
@@ -62,7 +63,8 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
     dumpSrcrefs     <- !is.null(expressionsIndex) && !is.null(srcrefsIndex);
 
     #pre-process expressions index to find out last expression of each source expression
-    #there is need to preprocess the expressions 
+    #there is need to preprocess the expressions references because we print them only 
+    #when the source reference index changes
     if(dumpExpressions || dumpSrcrefs){
         myExpressionsIndex <- rep(-1, length(expressionsIndex));
 
