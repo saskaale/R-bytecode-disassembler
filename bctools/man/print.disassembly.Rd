@@ -4,7 +4,7 @@
 \alias{print.disassembly}
 \title{Print bytecode object to output and returns it \emph{invisibly} (via \code{\link{invisible}(x)})}
 \usage{
-\method{print}{disassembly}(x, prefix = "", verbose = 0, maxdepth = 3,
+\method{print}{disassembly}(x, prefix = "", verbose = 0, maxdepth = 2,
   depth = 0, ...)
 }
 \arguments{
@@ -29,6 +29,7 @@
 \details{
 This is implementation of print method for bytecode object. 
 It works under internal R Bytecode structure.
+You can manually create bytecode object through \emph{compiler} package ( via for example \code{\link{cmpfun}} function )
 }
 \examples{
 library(compiler)
