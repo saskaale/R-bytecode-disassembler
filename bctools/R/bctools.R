@@ -50,6 +50,7 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
     srcref <- NULL
 
 
+    #get needed properties from constants object
     for (cnst in rev(constants)){
       if (class(cnst)=="srcrefsIndex")     srcrefsIndex <- cnst
       if (class(cnst)=="expressionsIndex") expressionsIndex <- cnst
@@ -96,8 +97,9 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
         cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
 
     #first pass to mark instruction with labels
-    n <- length(code)
-    labels <- rep(-2, n)        # -2=not used, -1=used, >0=index of label
+    #labels is array that describes if each instruction has label
+    n <- length(code) 
+    labels <- rep(-2, n)        #labels now contains -2=not used, -1=used
     i <- 2
     while( i <= n ) {
         v <- code[[i]]
@@ -115,6 +117,8 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
     }
 
     #second pass to count labels
+    #loop through labels array and if that instruction has label marked on it
+    #labels array now contains values: -2=not used, -1=used, >0=index of label
     i <- 2
     lastlabelno <- 0;
     while( i <= n ) {
@@ -124,10 +128,15 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
         }
         i<-i+1
     }
-
+    
+    
+    #functions to print each type of information ( arguments / source and expression references )
+    #each functions return TRUE / FALSE that indicates if any output has been printed
     dumpConstant<-function(v){
         v <- constants[[v+1]]
         if(typeof(v) == "list"){
+            
+            #the max depth of recursion is definied via maxdepth parameter
             if(depth < maxdepth){
                 if(typeof(v[[2]]) == "bytecode"){
                     v <- compiler::disassemble(v[[2]])
@@ -137,8 +146,8 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
                 }else{
                     cat("<INTERNAL_FUNCTION>")
                 }
-
             }
+            
         }else{
             #hack to print expression tree in infix notation instead of prefix
             z <- capture.output(dput(v))
@@ -148,6 +157,9 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
         TRUE
     }
     dumpDbgConstant <- function(v){
+        #there are 2 types of constants in bytecode
+        #this function corresponds to CONSTANT_DBG
+        #  which means that this type of constant is used just for debugging inside bytecode
         if(verbose > 1){
             dumpConstant(v);
         }else{
@@ -187,7 +199,9 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
     lastExprIndex <- -1
     i <- 2
     while( i <= n ) {
-        v <- code[[i]]
+    
+        #extract instruction from code array
+        instr <- code[[i]]
 
         cat("\n")
 
@@ -212,16 +226,21 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
             }
         }
 
-
         #print prefix ( one of argument ) before each instruction
         cat(paste0(prefix,"  "))
 
         #print instruction ( eg. ADD )
-        dumpOp(v)
+        dumpOp(instr)
 
-        argdescr <- Opcodes.argdescr[[paste0(v)]]
 
+        #instruction arguments description which is imported also from compiler package
+        #contains array in which each parameter describes type of argument
+        argdescr <- Opcodes.argdescr[[paste0(instr)]]
+        
         #iterate over each argument of instruction and print them
+        #the arguments are stored inside bytecode just after the instruction
+        #  so as we loop through instructions we increments the index in them
+        #  code array ( i<-i+1 )
         j <- 1
         printed <- 0
         while(j <= length(argdescr)){
@@ -230,6 +249,7 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
             }
 
             i<-i+1
+            #extract instruction argument from code array
             v <- code[[i]]
 
             t = argdescr[[j]]
