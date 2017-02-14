@@ -42,7 +42,7 @@ Opcodes.argdescr <- BCINFO$Arguments;
 #'
 #' @export
 
-print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...){
+print.disassembly <- function(x, prefix="", verbose=0, maxdepth=2, depth=0, ...){
     constants <- x[[3]]
     code <- x[[2]]
 
@@ -59,29 +59,8 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
     }
 
 
-    dumpExpressions <- verbose > 0 && !is.null(expressionsIndex) && !is.null(srcrefsIndex);
-    dumpSrcrefs     <- !is.null(expressionsIndex) && !is.null(srcrefsIndex);
-
-    #pre-process expressions index to find out last expression of each source expression
-    #there is need to preprocess the expressions references because we print them only 
-    #when the source reference index changes
-    if(dumpExpressions || dumpSrcrefs){
-        myExpressionsIndex <- rep(-1, length(expressionsIndex));
-
-        n <- length(code)
-        i <- n
-        lastSrcRef <- -1
-        lastExprIndex <- -1;
-        while( i > 1 ) {
-            srcRef <- srcrefsIndex[[i]]
-            if(srcRef != lastSrcRef){
-                lastSrcRef <- srcRef
-                lastExprIndex <- expressionsIndex[[i]]
-            }
-            myExpressionsIndex[[i]] <- lastExprIndex
-            i <- i-1
-        }
-    }
+    dumpExpressions <- verbose > 0 && !is.null(expressionsIndex);
+    dumpSrcrefs     <- !is.null(srcrefsIndex);
 
     #print leading source reference
     if(!is.null(srcref)){
@@ -91,9 +70,6 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
           cat(paste0(prefix,"@ ",filename,"#",srcref[[1]],"\n"))
       }
     }
-
-
-
 
     if(verbose > 0)
         cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
@@ -130,14 +106,14 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
         }
         i<-i+1
     }
-    
-    
+
+
     #functions to print each type of information ( arguments / source and expression references )
     #each functions return TRUE / FALSE that indicates if any output has been printed
     dumpConstant<-function(v){
         v <- constants[[v+1]]
         if(typeof(v) == "list"){
-            
+
             #the max depth of recursion is definied via maxdepth parameter
             if(depth < maxdepth){
                 if(typeof(v[[2]]) == "bytecode"){
@@ -149,7 +125,7 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
                     cat("<INTERNAL_FUNCTION>")
                 }
             }
-            
+
         }else{
             #hack to print expression tree in infix notation instead of prefix
             z <- capture.output(dput(v))
@@ -199,9 +175,10 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
 
     #third pass to print result
     lastExprIndex <- -1
+    lastSrcrefsIndex <- -1
     i <- 2
     while( i <= n ) {
-    
+
         #extract instruction from code array
         instr <- code[[i]]
 
@@ -212,18 +189,17 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
             cat(paste0(prefix,labels[[i]],":\n"))
         }
 
-        if(dumpExpressions || dumpSrcrefs){
-            curExprIndex <- myExpressionsIndex[[i]]
-
+        if(dumpSrcrefs){
+            curSrcrefsIndex <- srcrefsIndex[[i]]
+            if(curSrcrefsIndex != lastSrcrefsIndex){
+                dumpSrcRef(constants[[curSrcrefsIndex + 1 ]])
+                lastSrcrefsIndex <- curSrcrefsIndex
+            }
+        }
+        if(dumpExpressions){
+            curExprIndex <- expressionsIndex[[i]]
             if(curExprIndex != lastExprIndex){
-                if(dumpSrcrefs){
-                    cursrcref <- constants[[srcrefsIndex[[i]] + 1 ]];
-                    dumpSrcRef(cursrcref)
-                }
-                if(dumpExpressions){
-                    dumpExprRef(curExprIndex)
-                }
-
+                dumpExprRef(curExprIndex)
                 lastExprIndex <- curExprIndex
             }
         }
@@ -238,7 +214,7 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=3, depth=0, ...)
         #instruction arguments description which is imported also from compiler package
         #contains array in which each parameter describes type of argument
         argdescr <- Opcodes.argdescr[[paste0(instr)]]
-        
+
         #iterate over each argument of instruction and print them
         #the arguments are stored inside bytecode just after the instruction
         #  so as we loop through instructions we increments the index in them
