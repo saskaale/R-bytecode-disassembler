@@ -11,7 +11,7 @@ operands <- function(out){
     out <- filterWhitespaces(out)
 
     #extract src and expr references
-    out <- grep("(- #[0-9])|( @ )",out, value=TRUE, invert=TRUE)
+    out <- grep("(- #[0-9])|(\\s?@ )",out, value=TRUE, invert=TRUE)
 
     out
 }
