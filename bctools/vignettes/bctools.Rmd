@@ -11,11 +11,12 @@ vignette: >
 
 # bctools package
 
-This package contains pretty printer for R language Bytecode. It can be used for debugging purposes and for code analysis. It defines print method for bytecode object ( which is used internally by R language ).
+This package contains pretty printer for R language Bytecode. It can be used for debugging purposes and for code analysis. 
+It defines print method for bytecode object ( which is used internally by R language ).
 
 Print function support 3 levels of verbosity ( parameter verbose=0/1/2 ).
 
-* verbose=0 - Print only source references ( if they are available )
+* verbose=0 - Print only source references ( if they are available, if they aren't print expression references instead )
 * verbose=1 - The same as 0 + print bytecode version and print expression references ( if they are available ) and also print bytecode version
 * verbose=2 - The same as 1 + print all operands' arguments ( including ones used just for debugging )
 
@@ -23,11 +24,35 @@ Print function support 3 levels of verbosity ( parameter verbose=0/1/2 ).
 
 * labels starts with 1:, 2: ... ( references to them begins with $ - $1 / $2 ... ).
 * expression references begins with @
-* source references with # ( if you want to be sure there are source references in bytecode included, call options(keep.source = TRUE) )
+* source references with " - " ( if you want to be sure there are source references in bytecode included, call options(keep.source = TRUE) )
 
 ## Examples
 
-This is short example how to use the print method for bytecode object.
+In this short example you can see how to use the print method for bytecode object. You can see the bytecode object is 
+created with the \emph{compiler} package ( which is built in the default R distribution ).
+To see how create bytecode object visit [compiler manual page](https://stat.ethz.ch/R-manual/R-devel/library/compiler/html/compile.html).
+
+```{r}
+
+library(compiler)
+library(bctools)
+
+x <- 2
+
+bytecode <- compiler::compile(quote(x+2));
+
+print(compiler::disassemble(bytecode));
+
+```
+
+You can see that there is print method that you can call on bytecode object which is returned by compiler::disassemble function.
+
+
+## Examples that show different verbosity levels
+
+### Verbose 0 ( default )
+
+In the following example you can see printed source references ( which begins with @ )
 
 ```{r}
 
@@ -45,6 +70,57 @@ f <- function(x){
 bytecode <- compiler::cmpfun(f);
 
 print(compiler::disassemble(bytecode));
+
+```
+
+### Verbose 1
+
+In the following example you can see also printed expression references ( which begins with " - FILENAME:LINENO#" )
+
+```{r}
+
+library(compiler)
+library(bctools)
+
+f <- function(x){
+    sum <- 0
+    while(x > 0){
+        sum <- sum + x
+    }
+    sum
+}
+
+bytecode <- compiler::cmpfun(f);
+
+print(compiler::disassemble(bytecode), verbose=1);
+
+```
+
+
+### Verbose 2
+
+The last example is the same code except with the verbosity level setted to 2 ( the highest possible ).
+Notice that there occures for example aditional argument in ADD instruction ( it is used just for debugging purposes ).
+
+
+This argument was hidden in lower levels of verbosity, because it is not normally used for the code evaluation.
+
+```{r}
+
+library(compiler)
+library(bctools)
+
+f <- function(x){
+    sum <- 0
+    while(x > 0){
+        sum <- sum + x
+    }
+    sum
+}
+
+bytecode <- compiler::cmpfun(f);
+
+print(compiler::disassemble(bytecode), verbose=2);
 
 
 ```

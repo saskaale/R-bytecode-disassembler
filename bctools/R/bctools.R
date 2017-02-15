@@ -16,7 +16,7 @@ Opcodes.argdescr <- BCINFO$Arguments;
 #' @param x Bytecode object to be printed
 #' @param prefix number of spaces to print before each line ( used for intendation )
 #' @param verbose verbosity level ( 0 or 1 or 2)
-#'             0 - display only source references ( if they are available )
+#'             0 - display only source references ( if they are available, if they aren't print expression references instead )
 #'             1 - the same as 0 + display bytecode version and display expression references ( if they are available )
 #'             2 - the same as 1 + display every operand's argument ( including ones used just for debugging )
 #' @param maxdepth Maximum depth of nested functions which are printed
@@ -59,7 +59,7 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=2, depth=0, ...)
     }
 
 
-    dumpExpressions <- verbose > 0 && !is.null(expressionsIndex);
+    dumpExpressions <- ( verbose > 0 || is.null(srcrefsIndex) ) && !is.null(expressionsIndex);
     dumpSrcrefs     <- !is.null(srcrefsIndex);
 
     #print leading source reference
@@ -171,6 +171,7 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=2, depth=0, ...)
         cat(paste0(prefix,"  @ "))
         dumpConstant(exprIndex)
         cat("\n")
+        TRUE
     }
 
     #third pass to print result
@@ -207,7 +208,7 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=2, depth=0, ...)
         #print prefix ( one of argument ) before each instruction
         cat(paste0(prefix,"  "))
 
-        #print instruction ( eg. ADD )
+        #print instruction ( eg. ADD / SUB ... )
         dumpOp(instr)
 
 

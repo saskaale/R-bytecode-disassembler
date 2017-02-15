@@ -13,7 +13,7 @@
 \item{prefix}{number of spaces to print before each line ( used for intendation )}
 
 \item{verbose}{verbosity level ( 0 or 1 or 2)
-0 - display only source references ( if they are available )
+0 - display only source references ( if they are available, if they aren't print expression references instead )
 1 - the same as 0 + display bytecode version and display expression references ( if they are available )
 2 - the same as 1 + display every operand's argument ( including ones used just for debugging )}
 
