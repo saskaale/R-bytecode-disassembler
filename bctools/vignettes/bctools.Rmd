@@ -14,7 +14,7 @@ vignette: >
 This package contains pretty printer for R language Bytecode. It can be used for debugging purposes and for code analysis. 
 It defines print method for bytecode object ( which is used internally by R language ).
 
-Print function support 3 levels of verbosity ( parameter verbose=0/1/2 ).
+Print function support 3 levels of verbosity ( parameter verbose = 0 or 1 or 2 ).
 
 * verbose=0 - Print only source references ( if they are available, if they aren't print expression references instead )
 * verbose=1 - The same as 0 + print bytecode version and print expression references ( if they are available ) and also print bytecode version
