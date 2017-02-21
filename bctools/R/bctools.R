@@ -227,7 +227,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
 
         #iterate over each argument of instruction and print them
         #the arguments are stored inside bytecode just after the instruction
-        #  so as we loop through instructions we increments the index in them
+        #  so as we loop through instructions we increments the index into
         #  code array ( i<-i+1 )
         j <- 1
         printed <- 0
@@ -271,7 +271,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
 
 #' Set default verbosity level for bytecode \emph{print} method
 #'
-#' \code{bcverbose} Set default verbosity level for bytecode \emph{print} method
+#' \code{bcverbose} Set and/or get default verbosity level for bytecode \emph{print} method
 #'
 #'
 #' @param lvl verbosity level ( 0 or 1 or 2) - optional
