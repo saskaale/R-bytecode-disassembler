@@ -4,7 +4,7 @@
 \alias{print.disassembly}
 \title{Print bytecode object to output and returns it \emph{invisibly} (via \code{\link{invisible}(x)})}
 \usage{
-\method{print}{disassembly}(x, prefix = "", verbose = 0, maxdepth = 2,
+\method{print}{disassembly}(x, prefix = "", verbose = NULL, maxdepth = 2,
   depth = 0, ...)
 }
 \arguments{
@@ -15,7 +15,8 @@
 \item{verbose}{verbosity level ( 0 or 1 or 2)
 0 - display only source references ( if they are available, if they aren't print expression references instead )
 1 - the same as 0 + display bytecode version and display expression references ( if they are available )
-2 - the same as 1 + display every operand's argument ( including ones used just for debugging )}
+2 - the same as 1 + display every operand's argument ( including ones used just for debugging )
+default value can be pre-set by \emph{bcverbose} function}
 
 \item{maxdepth}{Maximum depth of nested functions which are printed}
 
@@ -44,8 +45,12 @@ a <- function(x){
 }
 bc <- compiler::cmpfun(a)
 
-print(compiler::disassemble(bc));
-print(compiler::disassemble(bc), verbose=1);
-print(compiler::disassemble(bc), verbose=2);
+#these two does the same
+disassemble(bc);
+print(disassemble(bc));
+
+#manually set verbose level
+print(disassemble(bc), verbose=1);
+print(disassemble(bc), verbose=2);
 
 }

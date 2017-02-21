@@ -1,9 +1,11 @@
 library(compiler)
 
-BCINFO=bcinfo();
-argtypes = BCINFO$Argtypes
+BCINFO <- bcinfo();
+argtypes <- BCINFO$Argtypes
 Opcodes.argdescr <- BCINFO$Arguments;
 
+conf <- new.env(parent = emptyenv())
+conf$verbosity <- 0
 
 #' Print bytecode object to output and returns it \emph{invisibly} (via \code{\link{invisible}(x)})
 #'
@@ -19,6 +21,7 @@ Opcodes.argdescr <- BCINFO$Arguments;
 #'             0 - display only source references ( if they are available, if they aren't print expression references instead )
 #'             1 - the same as 0 + display bytecode version and display expression references ( if they are available )
 #'             2 - the same as 1 + display every operand's argument ( including ones used just for debugging )
+#'             default value can be pre-set by \emph{bcverbose} function
 #' @param maxdepth Maximum depth of nested functions which are printed
 #' @param depth Current depth of nested functions which are being printed ( used for internal purposes in print recursion )
 #' @param ... Numeric, complex, or logical vectors.
@@ -36,13 +39,19 @@ Opcodes.argdescr <- BCINFO$Arguments;
 #' }
 #' bc <- compiler::cmpfun(a)
 #'
-#' print(compiler::disassemble(bc));
-#' print(compiler::disassemble(bc), verbose=1);
-#' print(compiler::disassemble(bc), verbose=2);
+#' #these two does the same
+#' disassemble(bc);
+#' print(disassemble(bc));
+#'
+#' #manually set verbose level
+#' print(disassemble(bc), verbose=1);
+#' print(disassemble(bc), verbose=2);
 #'
 #' @export
 
-print.disassembly <- function(x, prefix="", verbose=0, maxdepth=2, depth=0, ...){
+print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, ...){
+    if( is.null(verbose) ) verbose <- conf$verbosity
+
     constants <- x[[3]]
     code <- x[[2]]
 
@@ -257,4 +266,44 @@ print.disassembly <- function(x, prefix="", verbose=0, maxdepth=2, depth=0, ...)
 
     #returns invisible(x) as the default behavior of print method
     invisible(x)
+}
+
+
+#' Set default verbosity level for bytecode \emph{print} method
+#'
+#' \code{bcverbose} Set default verbosity level for bytecode \emph{print} method
+#'
+#'
+#' @param lvl verbosity level ( 0 or 1 or 2) - optional
+#'           if setted - set default bytecode verbosity level
+#'             0 - display only source references ( if they are available, if they aren't print expression references instead )
+#'             1 - the same as 0 + display bytecode version and display expression references ( if they are available )
+#'             2 - the same as 1 + display every operand's argument ( including ones used just for debugging )
+#'
+#'
+#' @return current verbosity level
+#'
+#' @examples
+#' 
+#' library(compiler)
+#' library(bctools)
+#' a <- function(x){
+#'   r <- 1
+#'   while(x){
+#'     r = r + x*x
+#'     x = x-1
+#'   }
+#'   r
+#' }
+#' bc <- compiler::cmpfun(a)
+#'
+#' #set default verbosity level
+#' bcverbose(2);
+#' disassemble(bc);
+#'
+#' @export
+
+bcverbose <- function( lvl=NULL ){
+    if( !is.null(lvl) ) { conf$verbosity <- lvl }
+    conf$verbosity
 }

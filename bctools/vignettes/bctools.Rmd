@@ -39,9 +39,9 @@ library(bctools)
 
 x <- 2
 
-bytecode <- compiler::compile(quote(x+2));
+bytecode <- compile(quote(x+2))
 
-print(compiler::disassemble(bytecode));
+disassemble(bytecode)
 
 ```
 
@@ -67,9 +67,9 @@ f <- function(x){
     sum
 }
 
-bytecode <- compiler::cmpfun(f);
+bytecode <- cmpfun(f)
 
-print(compiler::disassemble(bytecode));
+disassemble(bytecode)  #internally calls print(disassemble(bytecode))
 
 ```
 
@@ -90,9 +90,9 @@ f <- function(x){
     sum
 }
 
-bytecode <- compiler::cmpfun(f);
+bytecode <- cmpfun(f)
 
-print(compiler::disassemble(bytecode), verbose=1);
+print(disassemble(bytecode), verbose=1)
 
 ```
 
@@ -118,9 +118,42 @@ f <- function(x){
     sum
 }
 
-bytecode <- compiler::cmpfun(f);
+bytecode <- cmpfun(f)
 
-print(compiler::disassemble(bytecode), verbose=2);
+print(disassemble(bytecode), verbose=2)
 
+
+```
+
+
+### bcverbose function
+
+Default verbose level can be pre-set by the bcverbose function. This function also returns also that default verbosity value.
+
+It is supposed to be used 2 ways
+
+* without any arguments ( or lvl=NULL ) it just returns current default bytecode verbosity level
+* with lvl argument setted ( lvl!=NULL ) it set default bytecode verbosity level to it and returns that value
+
+```{r}
+
+library(compiler)
+library(bctools)
+
+f <- function(x){
+    sum <- 0
+    while(x > 0){
+        sum <- sum + x
+    }
+    sum
+}
+
+bytecode <- cmpfun(f)
+
+bcverbose()  #get default verbosity level
+
+bcverbose(2)  #set default verbosity level to 2, notice that this function also returns this value
+
+disassemble(bytecode) #print bytecode with default verbosity level ( currently setted to 2 )
 
 ```
