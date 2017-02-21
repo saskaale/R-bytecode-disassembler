@@ -40,12 +40,12 @@ conf$verbosity <- 0
 #' bc <- compiler::cmpfun(a)
 #'
 #' #these two does the same
-#' disassemble(bc);
-#' print(disassemble(bc));
+#' disassemble(bc)
+#' print(disassemble(bc))
 #'
 #' #manually set verbose level
-#' print(disassemble(bc), verbose=1);
-#' print(disassemble(bc), verbose=2);
+#' print(disassemble(bc), verbose=1)
+#' print(disassemble(bc), verbose=2)
 #'
 #' @export
 
@@ -138,7 +138,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
         }else{
             #hack to print expression tree in infix notation instead of prefix
             z <- capture.output(dput(v))
-            z <- sub("(\\s)\\s*", "\\1", z, perl=TRUE);
+            z <- sub("(\\s)\\s*", "\\1", z, perl=TRUE)
             cat(paste0(z))
         }
         TRUE
@@ -168,8 +168,8 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
         TRUE
     }
     dumpSrcRef<-function(cursrcref){
-        filename <- getSrcFilename(cursrcref);
-        lineno   <- getSrcLocation(cursrcref);
+        filename <- getSrcFilename(cursrcref)
+        lineno   <- getSrcLocation(cursrcref)
 
         o <- capture.output(print(cursrcref))
 
@@ -298,8 +298,8 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
 #' bc <- compiler::cmpfun(a)
 #'
 #' #set default verbosity level
-#' bcverbose(2);
-#' disassemble(bc);
+#' bcverbose(2)
+#' disassemble(bc)
 #'
 #' @export
 
