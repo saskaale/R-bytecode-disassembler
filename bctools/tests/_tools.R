@@ -29,6 +29,7 @@ filterWhitespaces <- function(v){
 }
 
 eqOut <- function(c1, c2){
+    #just compare vector c1 with c2
     identical(c1,c2)
 }
 
