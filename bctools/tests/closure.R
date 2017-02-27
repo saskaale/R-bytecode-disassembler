@@ -36,7 +36,7 @@ code <- c(
             "", 
             "", 
             "  CHECKFUN            ", 
-            "  CALL                (function() {  v <- 12  function() {  v * 10  } })()", 
+            "  CALL                (function() {  v <- 12;  function() {  v * 10  } })()", 
             "  SETVAR              f", 
             "  POP                 ", 
             " - #9: f()+1", 

@@ -139,6 +139,26 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
             #hack to print expression tree in infix notation instead of prefix
             z <- capture.output(dput(v))
             z <- sub("(\\s)\\s*", "\\1", z, perl=TRUE)
+
+            if(length(z) > 1){
+                # convert >>while (i) {  print(i)  i <- i - 1 }<< to >>while (i) {  print(i);  i <- i - 1 }<<
+                #   see the semicolon after print(i)
+
+                #because the printed code does not contain ; after each instruction we have to add to it
+                #called with first argument of current row and second of following row
+                z <- mapply(function(cur, nex){
+
+                    #current row does not end with { and following row does not start with } append 
+                    #   semilon after this instruction
+                    if( length(grep("\\{\\s*$", cur)) <= 0 && length(grep("^\\s*\\}", nex)) <= 0 ){
+                        paste0(cur, ";")
+                    }else{
+                        cur
+                    }
+
+                }, z, c(z[2:(length(z))], "}"));
+            }
+
             cat(paste0(z))
         }
         TRUE

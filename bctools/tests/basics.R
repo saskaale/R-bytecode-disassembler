@@ -120,7 +120,7 @@ out <- getOutput(swc)
 code <- c("BASEGUARD length(x) | $1", "GETBUILTIN length", "GETVAR x", 
         "PUSHARG", "CALLBUILTIN length(x)", "1:", "SETVAR n", "POP", 
         "LDCONST 1", "SETVAR i", "POP", "LDCONST 0", "SETVAR s", "POP", 
-        "2:", "GETVAR i", "GETVAR n", "LE", "BRIFNOT while (i <= n) { s <- s + x[i] i <- i + 1 } | $4", 
+        "2:", "GETVAR i", "GETVAR n", "LE", "BRIFNOT while (i <= n) { s <- s + x[i]; i <- i + 1 } | $4", 
         "GETVAR s", "GETVAR x", "STARTSUBSET_N x[i] | $3", "GETVAR_MISSOK i", 
         "VECSUBSET x[i]", "3:", "ADD", "SETVAR s", "POP", "GETVAR i", 
         "LDCONST 1", "ADD", "SETVAR i", "POP", "GOTO $2", "4:", "LDNULL", 
@@ -144,7 +144,7 @@ stopifnot(eqOut(operands(out), code))
 out <- getOutput(closurefc)
 code <- c("MAKECLOSURE <FUNCTION>", "LDCONST 12", "SETVAR v", "POP", 
         "MAKECLOSURE <FUNCTION>", "GETVAR v", "LDCONST 10", "MUL", "RETURN", 
-        "RETURN", "CHECKFUN", "CALL (function() { v <- 12 function() { v * 10 } })()", 
+        "RETURN", "CHECKFUN", "CALL (function() { v <- 12; function() { v * 10 } })()", 
         "SETVAR f", "POP", "GETFUN f", "CALL f()", "LDCONST 1", "ADD", 
         "RETURN")
 stopifnot(eqOut(operands(out), code))
