@@ -156,7 +156,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
                         cur
                     }
 
-                }, z, c(z[2:(length(z))], "}"));
+                }, z, c(z[2:(length(z))], "}"))
             }
 
             cat(paste0(z))
