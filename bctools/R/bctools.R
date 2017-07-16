@@ -16,6 +16,7 @@ conf$verbosity <- 0
 #' You can manually create bytecode object through \emph{compiler} package ( via for example \code{\link{cmpfun}} function )
 #'
 #' @param x Bytecode object to be printed
+#' @param select instruction position to be highlighted
 #' @param prefix number of spaces to print before each line ( used for intendation )
 #' @param verbose verbosity level ( 0 or 1 or 2)
 #'             0 - display only source references ( if they are available, if they aren't print expression references instead )
@@ -49,11 +50,12 @@ conf$verbosity <- 0
 #'
 #' @export
 
-print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, ...){
+print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, select=NULL, ...){
     if( is.null(verbose) ) verbose <- conf$verbosity
 
-    constants <- x[[3]]
-    code <- x[[2]]
+    code_breakpoint   <- x[[2]]
+    code              <- x[[3]]
+    constants         <- x[[4]]
 
     srcrefsIndex <- NULL
     expressionsIndex <- NULL
@@ -72,7 +74,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
     dumpSrcrefs     <- !is.null(srcrefsIndex);
 
     #print leading source reference
-    if(!is.null(srcref)){
+    if(is.null(select) && !is.null(srcref)){
       environm <- attr(srcref, "srcfile")
       filename <- getSrcFilename(environm)
       if(!identical(filename, character(0))){
@@ -80,14 +82,19 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
       }
     }
 
-    if(verbose > 0)
-        cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
+    if(is.null(select){
+        if(verbose > 0) {
+            cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
+        }
+        cat("\n")
+    }
 
     #first pass to mark instruction with labels
     #labels is array that describes if each instruction has label
     n <- length(code) 
     labels <- rep(-2, n)        #labels now contains -2=not used, -1=used
     i <- 2
+    instrCnt<-0 # count number of instructions
     while( i <= n ) {
         v <- code[[i]]
         argdescr <- Opcodes.argdescr[[paste0(v)]]
@@ -100,6 +107,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
             }
             j<-j+1
         }
+        instrCnt<-instrCnt+1
         i<-i+1
     }
 
@@ -128,7 +136,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
                 if(typeof(v[[2]]) == "bytecode"){
                     v <- compiler::disassemble(v[[2]])
                     cat("<FUNCTION>")
-                    print.disassembly(v, paste0(prefix,"   "),verbose=verbose, maxdepth = maxdepth, depth=depth+1)
+                    print.disassembly(v, select=NULL, prefix=paste0(prefix,"   "),verbose=verbose, maxdepth = maxdepth, depth=depth+1)
                     cat("\n")
                 }else{
                     cat("<INTERNAL_FUNCTION>")
@@ -204,15 +212,29 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
     }
 
     #third pass to print result
+    selected <- FALSE
     lastExprIndex <- -1
     lastSrcrefsIndex <- -1
     i <- 2
+    printedInstructions <- 0
     while( i <= n ) {
 
         #extract instruction from code array
         instr <- code[[i]]
+        instrname <- instr
 
-        cat("\n")
+        #instruction arguments description which is imported also from compiler package
+        #contains array in which each parameter describes type of argument
+        argdescr <- Opcodes.argdescr[[paste0(instr)]]
+        
+        #if the select arguments is not null we skipp every elements before select
+        # and all after 5 printed instructions after select
+        if( !is.null(select) 
+            && printedInstructions < instrCnt-5 
+            && (i < select || printedInstructions >= 5) ){
+            i <- i + 1 + length(argdescr)
+            next
+        }
 
         #this instruction has label pointing to it
         if(labels[[i]] > 0){
@@ -234,16 +256,25 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
             }
         }
 
+
         #print prefix ( one of argument ) before each instruction
-        cat(paste0(prefix,"  "))
+        pr <- paste0(prefix,"  ");
+        if(!selected && !is.null(select) && (i - 1) >= select ) {
+            #replace beginning of pr ( prefix ) with >>> ( current instruction )
+            pr <- paste0(substr(pr, 1 ,nchar(pr)-3), ">>>")
+            selected = TRUE
+        }
+        cat(pr)
+        if(verbose > 0){
+            cat(sprintf("%2d: ", i-1))
+        }
+        
+        if(grepl("^BREAKPOINT[0-9]+\\.OP$", code_breakpoint[[i]])){
+            instrname <- paste0("(BR) ", instrname)
+        }
 
         #print instruction ( eg. ADD / SUB ... )
-        dumpOp(instr)
-
-
-        #instruction arguments description which is imported also from compiler package
-        #contains array in which each parameter describes type of argument
-        argdescr <- Opcodes.argdescr[[paste0(instr)]]
+        dumpOp(instrname)
 
         #iterate over each argument of instruction and print them
         #the arguments are stored inside bytecode just after the instruction
@@ -280,7 +311,10 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, .
 
             j<-j+1
         }
+        printedInstructions<-printedInstructions+1
         i<-i+1
+        
+        cat("\n")
     }
     cat("\n")
 
