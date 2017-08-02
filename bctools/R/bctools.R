@@ -82,7 +82,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
       }
     }
 
-    if(is.null(select){
+    if(is.null(select)){
         if(verbose > 0) {
             cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
         }
