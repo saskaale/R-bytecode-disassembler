@@ -25,6 +25,7 @@ conf$verbosity <- 0
 #'             default value can be pre-set by \emph{bcverbose} function
 #' @param maxdepth Maximum depth of nested functions which are printed
 #' @param depth Current depth of nested functions which are being printed ( used for internal purposes in print recursion )
+#' @param select Position of currently selected instruction ( used in debugger )
 #' @param ... Numeric, complex, or logical vectors.
 #'
 #' @examples
@@ -82,7 +83,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
       }
     }
 
-    if(is.null(select){
+    if(is.null(select)){
         if(verbose > 0) {
             cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
         }
