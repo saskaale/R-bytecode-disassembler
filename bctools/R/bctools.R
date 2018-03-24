@@ -26,6 +26,7 @@ conf$verbosity <- 0
 #' @param maxdepth Maximum depth of nested functions which are printed
 #' @param depth Current depth of nested functions which are being printed ( used for internal purposes in print recursion )
 #' @param select Position of currently selected instruction ( used in debugger )
+#' @param peephole Turn the peephole on - show just area surronding the selected instruction ( must have selected, used in debugger )
 #' @param ... Numeric, complex, or logical vectors.
 #'
 #' @examples
@@ -51,9 +52,13 @@ conf$verbosity <- 0
 #'
 #' @export
 
-print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, select=NULL, ...){
+print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, select=NULL, peephole=FALSE, ...){
     if( is.null(verbose) ) verbose <- conf$verbosity
-
+    
+    #if you have the peephole turned on, you have to pass select flag for line
+    if( peephole && is.null(select) )
+      stop("if you have the peephole turned on ( peephole=TRUE ) , you have to pass select flag for line ( select=SOME_LINE )");
+    
     code_breakpoint   <- x[[2]]
     code              <- x[[3]]
     constants         <- x[[4]]
@@ -75,7 +80,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
     dumpSrcrefs     <- !is.null(srcrefsIndex);
 
     #print leading source reference
-    if(is.null(select) && !is.null(srcref)){
+    if(!peephole && !is.null(srcref)){
       environm <- attr(srcref, "srcfile")
       filename <- getSrcFilename(environm)
       if(!identical(filename, character(0))){
@@ -83,7 +88,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
       }
     }
 
-    if(is.null(select)){
+    if(!peephole){
         if(verbose > 0) {
             cat(paste0(prefix,"Bytecode ver. ",code[[1]],"\n"))
         }
@@ -228,9 +233,9 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
         #contains array in which each parameter describes type of argument
         argdescr <- Opcodes.argdescr[[paste0(instr)]]
         
-        #if the select arguments is not null we skipp every elements before select
+        #if the peephole mode is turned on we skip every elements before select
         # and all after 5 printed instructions after select
-        if( !is.null(select) 
+        if( peephole
             && printedInstructions < instrCnt-5 
             && (i < select || printedInstructions >= 5) ){
             i <- i + 1 + length(argdescr)
