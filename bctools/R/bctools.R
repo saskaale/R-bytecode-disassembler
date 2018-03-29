@@ -11,7 +11,7 @@ conf$verbosity <- 0
 #'
 #' \code{print.disassembly} print bytecode object into output in human-friendly way.
 #'
-#' This is implementation of print method for bytecode object. 
+#' This is implementation of print method for bytecode object.
 #' It works under internal R Bytecode structure.
 #' You can manually create bytecode object through \emph{compiler} package ( via for example \code{\link{cmpfun}} function )
 #'
@@ -19,7 +19,7 @@ conf$verbosity <- 0
 #' @param select instruction position to be highlighted
 #' @param prefix number of spaces to print before each line ( used for intendation )
 #' @param verbose verbosity level ( 0 or 1 or 2)
-#'             0 - display only source references ( if they are available, if they aren't print expression references instead )
+#'             0 (default value) - display only source references ( if they are available, if they aren't print expression references instead )
 #'             1 - the same as 0 + display bytecode version and display expression references ( if they are available )
 #'             2 - the same as 1 + display every operand's argument ( including ones used just for debugging )
 #'             default value can be pre-set by \emph{bcverbose} function
@@ -54,11 +54,11 @@ conf$verbosity <- 0
 
 print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, select=NULL, peephole=FALSE, ...){
     if( is.null(verbose) ) verbose <- conf$verbosity
-    
+
     #if you have the peephole turned on, you have to pass select flag for line
     if( peephole && is.null(select) )
       stop("if you have the peephole turned on ( peephole=TRUE ) , you have to pass select flag for line ( select=SOME_LINE )");
-    
+
     code_breakpoint   <- x[[2]]
     code              <- x[[3]]
     constants         <- x[[4]]
@@ -74,7 +74,6 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
       if (class(cnst)=="expressionsIndex") expressionsIndex <- cnst
       if (class(cnst)=="srcref")           srcref <- cnst
     }
-
 
     dumpExpressions <- ( verbose > 0 || is.null(srcrefsIndex) ) && !is.null(expressionsIndex);
     dumpSrcrefs     <- !is.null(srcrefsIndex);
@@ -97,7 +96,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
 
     #first pass to mark instruction with labels
     #labels is array that describes if each instruction has label
-    n <- length(code) 
+    n <- length(code)
     labels <- rep(-2, n)        #labels now contains -2=not used, -1=used
     i <- 2
     instrCnt<-0 # count number of instructions
@@ -107,9 +106,15 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
         j <- 1
         while(j <= length(argdescr)){
             i<-i+1
-            v <- code[[i]]
             if(argdescr[[j]] == argtypes$LABEL){
-              labels[[v+1]] <- -1
+                labels[[code[[i]]]] <- -1
+            }else if(argdescr[[j]] == argtypes$CONSTANT_LABEL){
+                v <- constants[[ code[[i]] + 1 ]]
+                if(!is.null(v)){
+                    for(k in 1:length(v)){
+                        labels[[v[[k]] + 1]] <- -1
+                    }
+                }
             }
             j<-j+1
         }
@@ -147,6 +152,8 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
                 }else{
                     cat("<INTERNAL_FUNCTION>")
                 }
+            }else{
+                cat("<FUNCTION>")
             }
 
         }else{
@@ -162,7 +169,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
                 #called with first argument of current row and second of following row
                 z <- mapply(function(cur, nex){
 
-                    #current row does not end with { and following row does not start with } append 
+                    #current row does not end with { and following row does not start with } append
                     #   semilon after this instruction
                     if( length(grep("\\{\\s*$", cur)) <= 0 && length(grep("^\\s*\\}", nex)) <= 0 ){
                         paste0(cur, ";")
@@ -187,8 +194,23 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
             FALSE
         }
     }
-    dumpLabel<-function(v){
+    dumpLabel <- function(v){
         cat(paste0( "$", labels[[ v+1 ]] ))
+        TRUE
+    }
+    dumpConstantLabels <- function(v){
+        if(is.null(v))
+            return(dumpConstant(v))
+
+        if(length(constants[[v+1]]) > 0){
+            v <- lapply(constants[[v+1]],
+                    function(v){
+                        paste0("$", labels[[ v+1 ]])
+                    })
+            cat(paste(v,collapse=', '))
+        }else{
+            cat('-')
+        }
         TRUE
     }
     dumpOp<-function(v){
@@ -216,6 +238,12 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
         cat("\n")
         TRUE
     }
+    dumpUnknown<-function(v){
+        cat("???")
+        TRUE
+    }
+
+
 
     #third pass to print result
     selected <- FALSE
@@ -232,11 +260,11 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
         #instruction arguments description which is imported also from compiler package
         #contains array in which each parameter describes type of argument
         argdescr <- Opcodes.argdescr[[paste0(instr)]]
-        
+
         #if the peephole mode is turned on we skip every elements before select
         # and all after 5 printed instructions after select
         if( peephole
-            && printedInstructions < instrCnt-5 
+            && printedInstructions < instrCnt-5
             && (i < select || printedInstructions >= 5) ){
             i <- i + 1 + length(argdescr)
             next
@@ -274,7 +302,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
         if(verbose > 0){
             cat(sprintf("%2d: ", i-1))
         }
-        
+
         if(grepl("^BREAKPOINT[0-9]+\\.OP$", code_breakpoint[[i]])){
             instrname <- paste0("(BR) ", instrname)
         }
@@ -297,29 +325,36 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
             #extract instruction argument from code array
             v <- code[[i]]
 
-            t = argdescr[[j]]
-            if(t==argtypes$LABEL){
-                if(dumpLabel(v))
-                    printed <- printed + 1
-            }else if(t==argtypes$CONSTANT){
-                if(dumpConstant(v))
-                    printed <- printed + 1
-            }else if(t==argtypes$CONSTANT_DBG){
-                if(dumpDbgConstant(v))
-                    printed <- printed + 1
-            }else if(t==argtypes$BOOL){
-                if(dumpValue(v))
-                    printed <- printed + 1
-            }else if(t==argtypes$INT){
-                if(dumpValue(v))
-                    printed <- printed + 1
-            }
+            t = paste0(argdescr[[j]])
+
+            #lookup table for argument types
+            argTypesDump <- c(dumpLabel,
+                            dumpConstant,
+                            dumpDbgConstant,
+                            dumpConstantLabels,
+                            dumpValue,
+                            dumpValue)
+            names(argTypesDump) <- c(
+                            argtypes$LABEL,
+                            argtypes$CONSTANT,
+                            argtypes$CONSTANT_DBG,
+                            argtypes$CONSTANT_LABEL,
+                            argtypes$BOOL,
+                            argtypes$INT)
+
+            dumpFun <- argTypesDump[[t]]
+            if(is.null(dumpFun))
+                dumpFun <- dumpUnknown
+
+            #printting the argument
+            if(dumpFun(v))
+                printed <- printed + 1
 
             j<-j+1
         }
         printedInstructions<-printedInstructions+1
         i<-i+1
-        
+
         cat("\n")
     }
     cat("\n")
@@ -327,6 +362,13 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
     #returns invisible(x) as the default behavior of print method
     invisible(x)
 }
+
+
+tryPrint.disassembly <- function(e, ...)
+    tryCatch(print.disassembly(e, ...), error = function(err) {
+        cat(paste(gettext("Error: bytecode dump failed - "), err$message, "at", deparse(err$call), "\n"))
+        e
+    })
 
 
 #' Set default verbosity level for bytecode \emph{print} method
@@ -344,7 +386,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
 #' @return current verbosity level
 #'
 #' @examples
-#' 
+#'
 #' library(compiler)
 #' library(bctools)
 #' a <- function(x){
