@@ -107,7 +107,7 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
         while(j <= length(argdescr)){
             i<-i+1
             if(argdescr[[j]] == argtypes$LABEL){
-                labels[[code[[i]]]] <- -1
+                labels[[ code[[i]] + 1 ]] <- -1
             }else if(argdescr[[j]] == argtypes$CONSTANT_LABEL){
                 v <- constants[[ code[[i]] + 1 ]]
                 if(!is.null(v)){
