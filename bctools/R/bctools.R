@@ -367,10 +367,19 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
 }
 
 
-tryPrint.disassembly <- function(e, ...)
-    tryCatch(print.disassembly(e, ...), error = function(err) {
+#' Try-catch wrapper over the print.disassembly function
+#'
+#' for additional instruction see the print.disassembly function definition
+#'
+#' @param x Bytecode object to be printed
+#' @param ... additional parameters passed to print.disassembly code
+#'
+#' @export
+
+tryPrint.disassembly <- function(x, ...)
+    tryCatch(print.disassembly(x, ...), error = function(err) {
         cat(paste(gettext("Error: bytecode dump failed - "), err$message, "at", deparse(err$call), "\n"))
-        e
+        x
     })
 
 
