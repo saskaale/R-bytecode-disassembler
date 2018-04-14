@@ -59,8 +59,11 @@ print.disassembly <- function(x, prefix="", verbose=NULL, maxdepth=2, depth=0, s
     if( peephole && is.null(select) )
       stop("if you have the peephole turned on ( peephole=TRUE ) , you have to pass select flag for line ( select=SOME_LINE )");
 
+    #can contain BREAKPOINT[0-9] instructions
     code_breakpoint   <- x[[2]]
+    #never contains BREAKPOINT[0-9] instruction
     code              <- x[[3]]
+    #constant buffer
     constants         <- x[[4]]
 
     srcrefsIndex <- NULL
