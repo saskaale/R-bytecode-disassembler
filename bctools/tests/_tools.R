@@ -3,8 +3,8 @@ library(bctools)
 
 enableJIT(0)
 
-getOutput <- function(bc, verbose=NULL){
-    capture.output(print(compiler::disassemble(bc), verbose=verbose))
+getOutput <- function(bc, ...){
+    capture.output(print(compiler::disassemble(bc), ...))
 }
 
 operands <- function(out){
