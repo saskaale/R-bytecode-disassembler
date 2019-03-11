@@ -1,6 +1,6 @@
 Package: bctools
 Type: Package
-Version: 0.1.0
+Version: 0.2.0
 Priority: NA
 Title: The R ByteCode Tools Package
 Author: Ales Saska <mail@alessaska.cz>
